@@ -1,0 +1,136 @@
+import * as uWS from 'uWebSockets.js';
+import { TemplatedApp } from 'uWebSockets.js';
+import * as IORedis from 'ioredis';
+import * as crypto from 'crypto';
+import * as Console from 'console';
+import UWSSocket from './UWSSocket';
+import IProvider, { ISocketHandler } from '../IProvider';
+import { encodePacket } from '../Converter';
+import { PacketType } from '../Packet';
+
+function generateUUID(): string {
+  return crypto.randomBytes(16).toString('hex');
+}
+
+class UWSProvider implements IProvider {
+  private _app: TemplatedApp;
+
+  private readonly _pub: IORedis.Redis | undefined;
+
+  private readonly _sub: IORedis.Redis | undefined;
+
+  private _connections: {
+    [uuid: string]: UWSSocket
+  } = {};
+
+  private _handlers: ISocketHandler[] = [];
+
+  constructor(app: uWS.TemplatedApp, options?: {
+    redisUrl?: string
+  }) {
+    this._app = app;
+    if (options && options.redisUrl) {
+      const { redisUrl } = options;
+      this._pub = new IORedis(redisUrl);
+      this._sub = new IORedis(redisUrl);
+
+      this._sub.subscribe('a', (err) => {
+        if (err) {
+          Console.error(err.message);
+        }
+      });
+      this._sub.subscribe('g.*', (err) => {
+        if (err) {
+          Console.error(err.message);
+        }
+      });
+
+      this._sub.on('message', (channel, message) => {
+        if (channel === 'a') {
+          return this._app.publish('a', message);
+        }
+        return this._app.publish(channel.substr(2), message);
+      });
+    }
+    this._app.ws('/*', {
+      /* Options */
+      compression: uWS.SHARED_COMPRESSOR,
+      maxPayloadLength: 16 * 1024 * 1024,
+      idleTimeout: 0,
+      maxBackpressure: 1024,
+
+      open: (ws) => {
+        const id: string = generateUUID();
+        /* Let this client listen to all sensor topics */
+
+        // Subscribe to all
+        ws.subscribe('a');
+
+        // eslint-disable-next-line no-param-reassign
+        ws.id = id;
+        this._connections[id] = new UWSSocket(id, ws);
+        this._handlers.forEach((handler) => handler(this._connections[id]));
+      },
+      message: (ws, buffer) => {
+        if (this._connections[ws.id]) {
+          this._connections[ws.id].onMessage(buffer);
+        } else {
+          Console.error(`Got message from unknown connection: ${ws.id}`);
+        }
+      },
+      drain: (ws) => {
+        Console.error(`Drain: ${ws.id}`);
+      },
+      close: (ws) => {
+        if (this._connections[ws.id]) {
+          this._connections[ws.id].onDisconnect();
+          delete this._connections[ws.id];
+        }
+      },
+    });
+  }
+
+  onConnection = (handler: ISocketHandler): this => {
+    this._handlers.push(handler);
+    return this;
+  };
+
+  toAll = (event: string, ...args: any[]): this => {
+    args.unshift(event);
+    const buffer = encodePacket({
+      type: PacketType.EVENT,
+      data: args,
+    });
+    if (this._pub) {
+      this._pub.publishBuffer('a', buffer);
+    } else {
+      this._app.publish('a', buffer);
+    }
+    return this;
+  };
+
+  to = (group: string, event: string, ...args: any[]): this => {
+    args.unshift(event);
+    const buffer = encodePacket({
+      type: PacketType.EVENT,
+      data: args,
+    });
+    if (this._pub) {
+      this._pub.publishBuffer(`g.${group}`, buffer);
+    } else {
+      this._app.publish(group, buffer);
+    }
+    return this;
+  };
+
+  listen = (port: number): Promise<any> => new Promise((resolve, reject) => {
+    this._app.listen(port, (socket) => {
+      if (socket) {
+        return resolve(this);
+      }
+      return reject(new Error(`Could not listen on port ${port}`));
+    });
+  });
+}
+
+export default UWSProvider;

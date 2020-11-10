@@ -1,0 +1,58 @@
+{
+  "name": "@delude88/teckos",
+  "version": "0.0.1",
+  "description": "Stage and device orchestration server for digital-stage.org",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": "lib/**/*",
+  "scripts": {
+    "dev": "LOG_LEVEL=trace nodemon --watch './src/**/*.ts,./example/**/*.ts' --exec 'ts-node' --project tsconfig.example.json example/index.ts",
+    "build:lib": "tsc --p tsconfig.json",
+    "build:example": "tsc --p tsconfig.example.json",
+    "build": "npm run build:lib",
+    "start": "npm run build:example && node ./dist/example/index.js",
+    "lint": "npx eslint ./src --ext .js,.ts",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digital-stage/server.git"
+  },
+  "keywords": [
+    "websocket",
+    "uwebsocket",
+    "realtime",
+    "callbacks"
+  ],
+  "author": "Tobias Hegemann <tobias.hegemann@googlemail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/delude88/teckos/issues"
+  },
+  "homepage": "https://github.com/delude88/teckos#readme",
+  "devDependencies": {
+    "@types/ioredis": "^4.17.7",
+    "@types/lodash": "^4.14.165",
+    "@types/node": "^14.14.7",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
+    "eslint": "^7.13.0",
+    "eslint-config-airbnb-typescript": "^12.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "nodemon": "^2.0.6",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.5"
+  },
+  "dependencies": {
+    "@types/component-emitter": "^1.2.10",
+    "dotenv": "^8.2.0",
+    "env": "0.0.2",
+    "ioredis": "^4.19.2",
+    "socket.io": "^3.0.1",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.8.0"
+  }
+}

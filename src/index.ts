@@ -1,14 +1,14 @@
-import IProvider from './IProvider';
-import ISocket from './ISocket';
-import { PacketType, Packet } from './Packet';
-import UWSProvider from './uWS/UWSProvider';
-import UWSSocket from './uWS/UWSSocket';
+import ITeckosProvider from './types/ITeckosProvider';
+import ITeckosSocket from './types/ITeckosSocket';
+import { TeckosPacketType, TeckosPacket } from './types/TeckosPacket';
+import UWSProvider from './UWSProvider';
+import UWSSocket from './UWSSocket';
 
 export {
   UWSSocket,
-  Packet,
-  PacketType,
-  ISocket,
-  IProvider,
+  TeckosPacket,
+  TeckosPacketType,
+  ITeckosSocket,
+  ITeckosProvider,
   UWSProvider,
 };

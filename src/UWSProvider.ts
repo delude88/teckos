@@ -4,15 +4,16 @@ import * as IORedis from 'ioredis';
 import * as crypto from 'crypto';
 import * as Console from 'console';
 import UWSSocket from './UWSSocket';
-import IProvider, { ISocketHandler } from '../IProvider';
-import { encodePacket } from '../Converter';
-import { PacketType } from '../Packet';
+import { encodePacket } from './util/Converter';
+import { TeckosPacketType } from './types/TeckosPacket';
+import { ITeckosSocketHandler } from './types/ITeckosSocketHandler';
+import ITeckosProvider from './types/ITeckosProvider';
 
 function generateUUID(): string {
   return crypto.randomBytes(16).toString('hex');
 }
 
-class UWSProvider implements IProvider {
+class UWSProvider implements ITeckosProvider {
   private _app: TemplatedApp;
 
   private readonly _pub: IORedis.Redis | undefined;
@@ -23,7 +24,7 @@ class UWSProvider implements IProvider {
     [uuid: string]: UWSSocket
   } = {};
 
-  private _handlers: ISocketHandler[] = [];
+  private _handlers: ITeckosSocketHandler[] = [];
 
   constructor(app: uWS.TemplatedApp, options?: {
     redisUrl?: string
@@ -90,7 +91,7 @@ class UWSProvider implements IProvider {
     });
   }
 
-  onConnection = (handler: ISocketHandler): this => {
+  onConnection = (handler: ITeckosSocketHandler): this => {
     this._handlers.push(handler);
     return this;
   };
@@ -98,7 +99,7 @@ class UWSProvider implements IProvider {
   toAll = (event: string, ...args: any[]): this => {
     args.unshift(event);
     const buffer = encodePacket({
-      type: PacketType.EVENT,
+      type: TeckosPacketType.EVENT,
       data: args,
     });
     if (this._pub) {
@@ -112,7 +113,7 @@ class UWSProvider implements IProvider {
   to = (group: string, event: string, ...args: any[]): this => {
     args.unshift(event);
     const buffer = encodePacket({
-      type: PacketType.EVENT,
+      type: TeckosPacketType.EVENT,
       data: args,
     });
     if (this._pub) {

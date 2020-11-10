@@ -1,7 +1,7 @@
 {
   "name": "teckos",
   "version": "0.0.1",
-  "description": "Stage and device orchestration server for digital-stage.org",
+  "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": "lib/**/*",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/digital-stage/server.git"
+    "url": "git+https://github.com/delude88/teckos.git"
   },
   "keywords": [
     "websocket",

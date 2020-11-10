@@ -7,7 +7,7 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
     [event: string]: ((...args: any[]) => void)[]
   } = {};
 
-  addListener = (event: T, listener: (...args: any[]) => void): this => {
+  public addListener = (event: T, listener: (...args: any[]) => void): this => {
     if (Object.keys(this._handlers).length === this._maxListeners) {
       throw new Error('Max listeners reached');
     }
@@ -16,7 +16,7 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
     return this;
   };
 
-  once = (event: T, listener: (...args: any[]) => void): this => {
+  public once = (event: T, listener: (...args: any[]) => void): this => {
     if (Object.keys(this._handlers).length === this._maxListeners) {
       throw new Error('Max listeners reached');
     }
@@ -29,19 +29,19 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
     return this;
   };
 
-  removeListener = (event: T, listener: (...args: any[]) => void): this => {
+  public removeListener = (event: T, listener: (...args: any[]) => void): this => {
     if (this._handlers[event]) {
       this._handlers[event] = this._handlers[event].filter((handler) => handler !== listener);
     }
     return this;
   };
 
-  off = (
+  public off = (
     event: T,
     listener: (...args: any[]) => void,
   ): this => this.removeListener(event, listener);
 
-  removeAllListeners = (event?: T): this => {
+  public removeAllListeners = (event?: T): this => {
     if (event) {
       delete this._handlers[event];
     } else {
@@ -50,25 +50,30 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
     return this;
   };
 
-  setMaxListeners = (n: number): this => {
+  public setMaxListeners = (n: number): this => {
     this._maxListeners = n;
     return this;
   };
 
-  getMaxListeners = (): number => this._maxListeners;
+  public getMaxListeners = (): number => this._maxListeners;
 
-  listeners = (event: T): Function[] => [...this._handlers[event]];
+  public listeners = (event: T): Function[] => {
+    if (this._handlers[event]) {
+      return [...this._handlers[event]];
+    }
+    return [];
+  };
 
-  rawListeners = (event: T): Function[] => [...this._handlers[event]];
+  public rawListeners = (event: T): Function[] => [...this._handlers[event]];
 
-  listenerCount = (event: T): number => {
+  public listenerCount = (event: T): number => {
     if (this._handlers[event]) {
       return Object.keys(this._handlers[event]).length;
     }
     return 0;
   };
 
-  prependListener = (event: T, listener: (...args: any[]) => void): this => {
+  public prependListener = (event: T, listener: (...args: any[]) => void): this => {
     if (Object.keys(this._handlers).length === this._maxListeners) {
       throw new Error('Max listeners reached');
     }
@@ -77,7 +82,7 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
     return this;
   };
 
-  prependOnceListener = (event: T, listener: (...args: any[]) => void): this => {
+  public prependOnceListener = (event: T, listener: (...args: any[]) => void): this => {
     if (Object.keys(this._handlers).length === this._maxListeners) {
       throw new Error('Max listeners reached');
     }
@@ -90,11 +95,14 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
     return this;
   };
 
-  eventNames = (): (T)[] => (Object.keys(this._handlers) as T[]);
+  public eventNames = (): (T)[] => (Object.keys(this._handlers) as T[]);
 
-  on = (event: T, listener: (...args: any[]) => void): this => this.addListener(event, listener);
+  public on = (
+    event: T,
+    listener: (...args: any[]) => void,
+  ): this => this.addListener(event, listener);
 
-  emit = (event: T, ...args: any[]): boolean => {
+  public emit = (event: T, ...args: any[]): boolean => {
     const listeners = this.listeners(event);
     if (listeners.length > 0) {
       listeners.forEach((listener) => listener(args));

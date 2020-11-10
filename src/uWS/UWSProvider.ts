@@ -39,18 +39,18 @@ class UWSProvider implements IProvider {
           Console.error(err.message);
         }
       });
-      this._sub.subscribe('g.*', (err) => {
+      // Since we are only subscribing to a,
+      // no further checks are necessary (trusting ioredis here)
+      this._sub.on('message', (channel, message) => this._app.publish(channel.substr(2), message));
+
+      this._sub.psubscribe('g.*', (err) => {
         if (err) {
           Console.error(err.message);
         }
       });
-
-      this._sub.on('message', (channel, message) => {
-        if (channel === 'a') {
-          return this._app.publish('a', message);
-        }
-        return this._app.publish(channel.substr(2), message);
-      });
+      // Since we are only p-subscribing to g.*,
+      // no further checks are necessary (trusting ioredis here)
+      this._sub.on('pmessage', (channel, pattern, message) => this._app.publish(pattern.substr(2), message));
     }
     this._app.ws('/*', {
       /* Options */

@@ -4,7 +4,7 @@
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": "lib/**/*",
+  "files": ["lib/**/*"],
   "scripts": {
     "dev": "LOG_LEVEL=trace nodemon --watch './src/**/*.ts,./example/**/*.ts' --exec 'ts-node' --project tsconfig.example.json example/index.ts",
     "build:lib": "tsc --p tsconfig.json",

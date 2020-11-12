@@ -16,6 +16,8 @@ function generateUUID(): string {
 class UWSProvider implements ITeckosProvider {
   private _app: TemplatedApp;
 
+  private _verbose: boolean = false;
+
   private readonly _pub: IORedis.Redis | undefined;
 
   private readonly _sub: IORedis.Redis | undefined;
@@ -27,31 +29,37 @@ class UWSProvider implements ITeckosProvider {
   private _handlers: ITeckosSocketHandler[] = [];
 
   constructor(app: uWS.TemplatedApp, options?: {
-    redisUrl?: string
+    redisUrl?: string,
+    verbose?: boolean
   }) {
     this._app = app;
-    if (options && options.redisUrl) {
-      const { redisUrl } = options;
-      this._pub = new IORedis(redisUrl);
-      this._sub = new IORedis(redisUrl);
+    if (options) {
+      if (options.verbose) {
+        this._verbose = options.verbose;
+      }
+      if (options.redisUrl) {
+        const { redisUrl } = options;
+        this._pub = new IORedis(redisUrl);
+        this._sub = new IORedis(redisUrl);
 
-      this._sub.subscribe('a', (err) => {
-        if (err) {
-          Console.error(err.message);
-        }
-      });
-      // Since we are only subscribing to a,
-      // no further checks are necessary (trusting ioredis here)
-      this._sub.on('message', (channel, message) => this._app.publish(channel.substr(2), message));
+        this._sub.subscribe('a', (err) => {
+          if (err) {
+            Console.error(err.message);
+          }
+        });
+        // Since we are only subscribing to a,
+        // no further checks are necessary (trusting ioredis here)
+        this._sub.on('message', (channel, message) => this._app.publish(channel.substr(2), message));
 
-      this._sub.psubscribe('g.*', (err) => {
-        if (err) {
-          Console.error(err.message);
-        }
-      });
-      // Since we are only p-subscribing to g.*,
-      // no further checks are necessary (trusting ioredis here)
-      this._sub.on('pmessage', (channel, pattern, message) => this._app.publish(pattern.substr(2), message));
+        this._sub.psubscribe('g.*', (err) => {
+          if (err) {
+            Console.error(err.message);
+          }
+        });
+        // Since we are only p-subscribing to g.*,
+        // no further checks are necessary (trusting ioredis here)
+        this._sub.on('pmessage', (channel, pattern, message) => this._app.publish(pattern.substr(2), message));
+      }
     }
     this._app.ws('/*', {
       /* Options */
@@ -69,7 +77,7 @@ class UWSProvider implements ITeckosProvider {
 
         // eslint-disable-next-line no-param-reassign
         ws.id = id;
-        this._connections[id] = new UWSSocket(id, ws);
+        this._connections[id] = new UWSSocket(id, ws, this._verbose);
         this._handlers.forEach((handler) => handler(this._connections[id]));
       },
       message: (ws, buffer) => {

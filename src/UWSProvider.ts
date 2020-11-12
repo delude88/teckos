@@ -3,11 +3,14 @@ import { TemplatedApp } from 'uWebSockets.js';
 import * as IORedis from 'ioredis';
 import * as crypto from 'crypto';
 import * as Console from 'console';
+import debug from 'debug';
 import UWSSocket from './UWSSocket';
 import { encodePacket } from './util/Converter';
 import { TeckosPacketType } from './types/TeckosPacket';
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler';
 import ITeckosProvider from './types/ITeckosProvider';
+
+const d = debug('teckos:provider');
 
 function generateUUID(): string {
   return crypto.randomBytes(16).toString('hex');
@@ -15,8 +18,6 @@ function generateUUID(): string {
 
 class UWSProvider implements ITeckosProvider {
   private _app: TemplatedApp;
-
-  private _verbose: boolean = false;
 
   private readonly _pub: IORedis.Redis | undefined;
 
@@ -29,15 +30,12 @@ class UWSProvider implements ITeckosProvider {
   private _handlers: ITeckosSocketHandler[] = [];
 
   constructor(app: uWS.TemplatedApp, options?: {
-    redisUrl?: string,
-    verbose?: boolean
+    redisUrl?: string
   }) {
     this._app = app;
     if (options) {
-      if (options.verbose) {
-        this._verbose = options.verbose;
-      }
       if (options.redisUrl) {
+        d(`Using REDIS at ${options.redisUrl}`);
         const { redisUrl } = options;
         this._pub = new IORedis(redisUrl);
         this._sub = new IORedis(redisUrl);
@@ -58,7 +56,11 @@ class UWSProvider implements ITeckosProvider {
         });
         // Since we are only p-subscribing to g.*,
         // no further checks are necessary (trusting ioredis here)
-        this._sub.on('pmessage', (channel, pattern, message) => this._app.publish(pattern.substr(2), message));
+        this._sub.on('pmessage', (channel, pattern, message) => {
+          const group = pattern.substr(2);
+          d(`Publishing message from REDIS to group ${group}`);
+          this._app.publish(group, message);
+        });
       }
     }
     this._app.ws('/*', {
@@ -77,7 +79,7 @@ class UWSProvider implements ITeckosProvider {
 
         // eslint-disable-next-line no-param-reassign
         ws.id = id;
-        this._connections[id] = new UWSSocket(id, ws, this._verbose);
+        this._connections[id] = new UWSSocket(id, ws);
         this._handlers.forEach((handler) => handler(this._connections[id]));
       },
       message: (ws, buffer) => {
@@ -88,7 +90,7 @@ class UWSProvider implements ITeckosProvider {
         }
       },
       drain: (ws) => {
-        Console.error(`Drain: ${ws.id}`);
+        d(`Drain: ${ws.id}`);
       },
       close: (ws) => {
         if (this._connections[ws.id]) {
@@ -113,6 +115,7 @@ class UWSProvider implements ITeckosProvider {
     if (this._pub) {
       this._pub.publishBuffer('a', buffer);
     } else {
+      d(`Publishing event ${event} to group a`);
       this._app.publish('a', buffer);
     }
     return this;
@@ -127,6 +130,7 @@ class UWSProvider implements ITeckosProvider {
     if (this._pub) {
       this._pub.publishBuffer(`g.${group}`, buffer);
     } else {
+      d(`Publishing event ${event} to group ${group}`);
       this._app.publish(group, buffer);
     }
     return this;

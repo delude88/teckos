@@ -1,20 +1,20 @@
-import { config } from 'dotenv';
+import {config} from 'dotenv';
 import * as uWS from 'uWebSockets.js';
-import { UWSProvider } from '../src';
+import {UWSProvider} from '../src';
 
 config();
 
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 
-const io = new UWSProvider(uWS.App(), process.env.USE_REDIS ? {
-  redisUrl: process.env.REDIS_URL,
-  verbose: true
-} : undefined);
+const io = new UWSProvider(uWS.App(), {
+  redisUrl: process.env.REDIS_URL
+});
 io.onConnection((socket) => {
+  socket.join("usergroup");
+
   socket.on('token', (payload) => {
     if (payload.token === "mytoken") {
       console.log('Auth successful');
-      socket.join("mygroup");
       io.toAll('HELLO', 'New user');
 
       socket.emit('ready');
@@ -28,9 +28,10 @@ io.onConnection((socket) => {
     console.log("Got 'no-args'");
   })
 
-  socket.on('hello', () => {
-    console.log("Got 'hello'");
-    socket.emit("hello");
+  socket.on('hello', (name) => {
+    console.log("Got 'hello', broadcasting to all and to group 'usergroup'");
+    io.toAll('hello', name);
+    io.to('usergroup', 'notification', name);
   })
 
   socket.on('work', (data, fn: (error?: string) => void) => {
@@ -46,6 +47,7 @@ io.onConnection((socket) => {
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
+
 });
 
 io.listen(PORT)

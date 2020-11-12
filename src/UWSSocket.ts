@@ -1,15 +1,16 @@
 import { WebSocket } from 'uWebSockets.js';
 import * as Console from 'console';
+import debug from 'debug';
 import SocketEventEmitter from './SocketEventEmitter';
 import { decodePacket, encodePacket } from './util/Converter';
 import TeckosSocketEvent from './types/TeckosSocketEvent';
 import { TeckosPacket, TeckosPacketType } from './types/TeckosPacket';
 import ITeckosSocket from './types/ITeckosSocket';
 
+const d = debug('teckos:socket');
+
 class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckosSocket {
   protected readonly _id: string;
-
-  protected readonly _verbose: boolean;
 
   protected readonly _ws: WebSocket;
 
@@ -27,33 +28,26 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     return this._id;
   }
 
-  constructor(id: string, ws: WebSocket, verbose: boolean) {
+  constructor(id: string, ws: WebSocket) {
     super();
-    this._verbose = verbose;
     this._id = id;
     this._ws = ws;
   }
 
   join = (group: string): this => {
-    if (this._verbose) {
-      console.debug(`${this._id} joining group ${group}`);
-    }
+    d(`${this._id} joining group ${group}`);
     this._ws.subscribe(group);
     return this;
   };
 
   leave = (group: string): this => {
-    if (this._verbose) {
-      console.debug(`${this._id} left group ${group}`);
-    }
+    d(`${this._id} left group ${group}`);
     this._ws.unsubscribe(group);
     return this;
   };
 
   leaveAll = (): this => {
-    if (this._verbose) {
-      console.debug(`${this._id} left all groups`);
-    }
+    d(`${this._id} left all groups`);
     this._ws.unsubscribeAll();
     return this;
   };
@@ -79,14 +73,11 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
       packet.id = this._fnId;
       this._fnId += 1;
     }
-
     return this._send(packet);
   };
 
   private _send = (packet: TeckosPacket): boolean => {
-    if (this._verbose) {
-      console.debug(`Sending packet to ${this._id}: ${packet.data}`);
-    }
+    d(`Sending packet to ${this._id}:  ${packet.data}`);
     return this._ws.send(encodePacket(packet));
   };
 
@@ -108,9 +99,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
 
   onMessage = (buffer: ArrayBuffer) => {
     const packet = decodePacket(buffer);
-    if (this._verbose) {
-      console.debug(`Got packet from ${this._id}: ${packet.data}`);
-    }
+    d(`Got packet from ${this._id}: ${packet.data}`);
 
     if (packet.type === TeckosPacketType.EVENT) {
       const event = packet.data[0];
@@ -138,9 +127,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
   };
 
   onDisconnect = () => {
-    if (this._verbose) {
-      console.debug(`Client ${this._id} disconnected`);
-    }
+    d(`Client ${this._id} disconnected`);
     if (this._handlers.disconnect) {
       this._handlers.disconnect.forEach((handler) => handler());
     }
@@ -149,9 +136,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
   error = (message?: string): boolean => this.emit('error', message);
 
   disconnect = (): this => {
-    if (this._verbose) {
-      console.debug(`Disconnecting ${this._id}`);
-    }
+    d(`Disconnecting ${this._id}`);
     this._ws.close();
     return this;
   };

@@ -5,8 +5,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "lib/**/*",
-    "uWebSockets.js/dist/**/*"
+    "lib/**/*"
   ],
   "scripts": {
     "dev": "DEBUG=* nodemon --watch src --watch example -e ts --exec 'ts-node' --project tsconfig.example.json example/index.ts",

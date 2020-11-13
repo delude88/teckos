@@ -24,8 +24,9 @@ io.onConnection((socket) => {
     }
   });
 
-  socket.on('no-args', () => {
+  socket.on('no-args', (bla) => {
     console.log("Got 'no-args'");
+    bla();
   })
 
   socket.on('hello', (name) => {

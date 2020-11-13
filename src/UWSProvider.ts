@@ -79,7 +79,11 @@ class UWSProvider implements ITeckosProvider {
         // eslint-disable-next-line no-param-reassign
         ws.id = id;
         this._connections[id] = new UWSSocket(id, ws);
-        this._handlers.forEach((handler) => handler(this._connections[id]));
+        try {
+          this._handlers.forEach((handler) => handler(this._connections[id]));
+        } catch (handlerError) {
+          console.error(handlerError);
+        }
       },
       message: (ws, buffer) => {
         if (this._connections[ws.id]) {

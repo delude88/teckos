@@ -111,7 +111,11 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
           args.push(this._ack(packet.id));
         }
 
-        this._handlers[event].forEach((handler) => handler(...args));
+        try {
+          this._handlers[event].forEach((handler) => handler(...args));
+        } catch (eventError) {
+          console.error(eventError);
+        }
       }
     } else if (packet.type === TeckosPacketType.ACK
       && packet.id !== undefined) {

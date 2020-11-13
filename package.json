@@ -10,15 +10,12 @@
   ],
   "scripts": {
     "dev": "DEBUG=* nodemon --watch src --watch example -e ts --exec 'ts-node' --project tsconfig.example.json example/index.ts",
-    "init:git": "git submodule update --init --recursive",
-    "init:build": "make -C ./uWebSockets.js --silent",
-    "init": "npm run init:git && npm run init:build",
-    "build:lib": "tsc --p tsconfig.json && copyfiles -f ./uWebSockets.js/dist/*.node ./lib/uWebSockets/",
+    "build:lib": "tsc --p tsconfig.json",
     "build:example": "tsc --p tsconfig.example.json",
     "build": "npm run build:lib",
     "start": "npm run build:example && node ./dist/example/index.js",
     "lint": "npx eslint ./src --ext .js,.ts",
-    "prepare": "npm run init && npm run build",
+    "prepare": "npm run build",
     "prepublishOnly": "npm run lint",
     "preversion": "npm run lint",
     "version": "git add -A src",
@@ -58,6 +55,7 @@
   },
   "dependencies": {
     "debug": "^4.2.0",
-    "ioredis": "^4.19.2"
+    "ioredis": "^4.19.2",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.10.0"
   }
 }

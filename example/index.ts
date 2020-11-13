@@ -1,6 +1,6 @@
 import {config} from 'dotenv';
-import * as uWS from '../lib/uWebSockets';
-import {UWSProvider} from "../lib";
+import * as uWS from 'uWebSockets.js';
+import {UWSProvider} from "../src";
 
 config();
 

@@ -2,8 +2,7 @@ import * as IORedis from 'ioredis';
 import * as crypto from 'crypto';
 import * as Console from 'console';
 import debug from 'debug';
-import { TemplatedApp } from './uWebSockets';
-import * as uWS from './uWebSockets';
+import * as uWS from 'uWebSockets.js';
 import UWSSocket from './UWSSocket';
 import { encodePacket } from './util/Converter';
 import { TeckosPacketType } from './types/TeckosPacket';
@@ -17,7 +16,7 @@ function generateUUID(): string {
 }
 
 class UWSProvider implements ITeckosProvider {
-  private _app: TemplatedApp;
+  private _app: uWS.TemplatedApp;
 
   private readonly _pub: IORedis.Redis | undefined;
 

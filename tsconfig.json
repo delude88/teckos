@@ -5,8 +5,7 @@
     "declaration": true,
     "sourceMap": true,
     "strict": true,
-    "outDir": "lib",
-    "allowJs": true
+    "outDir": "lib"
   },
   "lib": [
     "es2015"

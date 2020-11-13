@@ -10,8 +10,8 @@
     "es2015"
   ],
   "include": [
-    "example/**/*.ts",
-    "src/**/*.ts"
+    "example/**/*",
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

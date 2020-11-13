@@ -1,9 +1,9 @@
-import * as uWS from 'uWebSockets.js';
-import { TemplatedApp } from 'uWebSockets.js';
 import * as IORedis from 'ioredis';
 import * as crypto from 'crypto';
 import * as Console from 'console';
 import debug from 'debug';
+import { TemplatedApp } from './uWebSockets';
+import * as uWS from './uWebSockets';
 import UWSSocket from './UWSSocket';
 import { encodePacket } from './util/Converter';
 import { TeckosPacketType } from './types/TeckosPacket';

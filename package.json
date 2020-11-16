@@ -1,19 +1,18 @@
 {
   "name": "teckos",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib/**/*",
-    "ext/**/*",
-    "uWebSockets/**/*"
+    "ext/**/*"
   ],
   "scripts": {
     "init": "git submodule update --init --recursive",
     "build:ext": "make -C ./ext/uWebSockets && copyfiles -f ./ext/uWebSockets/dist/*.node ./uWebSockets && copyfiles ./ext/uWebSockets/dist/uws.js ./uWebSockets/index.js && copyfiles -f ./ext/uWebSockets/docs/index.d.ts ./uWebSockets",
     "build:lib": "tsc --p tsconfig.json",
-    "build": "npm run build:lib",
+    "build": "npm run build:ext && npm run build:lib",
     "lint": "npx eslint ./src --ext .js,.ts",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint",

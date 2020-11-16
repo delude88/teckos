@@ -20,12 +20,18 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
 
   protected _maxListeners: number = 50;
 
+  public _alive: boolean = true;
+
   _handlers: {
     [event: string]: ((...args: any[]) => void)[]
   } = {};
 
   get id(): string {
     return this._id;
+  }
+
+  get ws(): WebSocket {
+    return this._ws;
   }
 
   constructor(id: string, ws: WebSocket) {

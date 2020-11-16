@@ -26,13 +26,14 @@ io.onConnection((socket) => {
 
   socket.on('no-args', (bla) => {
     console.log("Got 'no-args'");
+    console.log("Expect the following to be catched:");
     bla();
   })
 
-  socket.on('hello', (name) => {
+  socket.on('hello', (firstName, lastName) => {
     console.log("Got 'hello', broadcasting to all and to group 'usergroup'");
-    io.toAll('hello', name);
-    io.to('usergroup', 'notification', name);
+    io.toAll('hello', firstName, lastName);
+    io.to('usergroup', 'notification', firstName, lastName);
   })
 
   socket.on('work', (data, fn: (error?: string) => void) => {

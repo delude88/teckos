@@ -8,8 +8,14 @@ import { encodePacket } from './util/Converter';
 import { TeckosPacketType } from './types/TeckosPacket';
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler';
 import ITeckosProvider from './types/ITeckosProvider';
+import { TeckosOptions } from './types/TeckosOptions';
 
 const d = debug('teckos:provider');
+
+const DEFAULT_OPTION: TeckosOptions = {
+  pingInterval: 25000,
+  pingTimeout: 5000,
+};
 
 function generateUUID(): string {
   return crypto.randomBytes(16).toString('hex');
@@ -17,6 +23,8 @@ function generateUUID(): string {
 
 class UWSProvider implements ITeckosProvider {
   private _app: uWS.TemplatedApp;
+
+  private readonly _options: TeckosOptions;
 
   private readonly _pub: IORedis.Redis | undefined;
 
@@ -28,39 +36,41 @@ class UWSProvider implements ITeckosProvider {
 
   private _handlers: ITeckosSocketHandler[] = [];
 
-  constructor(app: uWS.TemplatedApp, options?: {
-    redisUrl?: string
-  }) {
+  constructor(app: uWS.TemplatedApp, options?: TeckosOptions) {
     this._app = app;
-    if (options) {
-      if (options.redisUrl) {
-        d(`Using REDIS at ${options.redisUrl}`);
-        const { redisUrl } = options;
-        this._pub = new IORedis(redisUrl);
-        this._sub = new IORedis(redisUrl);
+    this._options = {
+      redisUrl: options?.redisUrl || undefined,
+      pingInterval: options?.pingInterval || DEFAULT_OPTION.pingInterval,
+      pingTimeout: options?.pingInterval || DEFAULT_OPTION.pingTimeout,
+    };
 
-        this._sub.subscribe('a', (err) => {
-          if (err) {
-            Console.error(err.message);
-          }
-        });
-        // Since we are only subscribing to a,
-        // no further checks are necessary (trusting ioredis here)
-        this._sub.on('message', (channel, message) => this._app.publish(channel.substr(2), message));
+    const { redisUrl } = this._options;
+    if (redisUrl) {
+      d(`Using REDIS at ${this._options.redisUrl}`);
+      this._pub = new IORedis(redisUrl);
+      this._sub = new IORedis(redisUrl);
 
-        this._sub.psubscribe('g.*', (err) => {
-          if (err) {
-            Console.error(err.message);
-          }
-        });
-        // Since we are only p-subscribing to g.*,
-        // no further checks are necessary (trusting ioredis here)
-        this._sub.on('pmessage', (channel, pattern, message) => {
-          const group = pattern.substr(2);
-          d(`Publishing message from REDIS to group ${group}`);
-          this._app.publish(group, message);
-        });
-      }
+      this._sub.subscribe('a', (err) => {
+        if (err) {
+          Console.error(err.message);
+        }
+      });
+      // Since we are only subscribing to a,
+      // no further checks are necessary (trusting ioredis here)
+      this._sub.on('message', (channel, message) => this._app.publish(channel.substr(2), message));
+
+      this._sub.psubscribe('g.*', (err) => {
+        if (err) {
+          Console.error(err.message);
+        }
+      });
+      // Since we are only p-subscribing to g.*,
+      // no further checks are necessary (trusting ioredis here)
+      this._sub.on('pmessage', (channel, pattern, message) => {
+        const group = pattern.substr(2);
+        d(`Publishing message from REDIS to group ${group}`);
+        this._app.publish(group, message);
+      });
     }
     this._app.ws('/*', {
       /* Options */
@@ -85,6 +95,11 @@ class UWSProvider implements ITeckosProvider {
           console.error(handlerError);
         }
       },
+      pong: (ws) => {
+        d('PONG');
+        // eslint-disable-next-line no-param-reassign
+        ws.alive = true;
+      },
       message: (ws, buffer) => {
         if (this._connections[ws.id]) {
           this._connections[ws.id].onMessage(buffer);
@@ -102,7 +117,28 @@ class UWSProvider implements ITeckosProvider {
         }
       },
     });
+
+    // Add ping
+    this._keepAliveSockets();
   }
+
+  private _keepAliveSockets = () => {
+    setTimeout((connections: {
+      [uuid: string]: UWSSocket
+    }) => {
+      Object.keys(connections).forEach((uuid) => {
+        if (this._connections[uuid].ws.alive) {
+          this._connections[uuid].ws.alive = false;
+          this._connections[uuid].ws.ping();
+        } else {
+          // Terminate connection
+          d(`Ping pong timeout for ${uuid}`);
+          this._connections[uuid].disconnect();
+        }
+      });
+      this._keepAliveSockets();
+    }, this._options.pingInterval, this._connections);
+  };
 
   onConnection = (handler: ITeckosSocketHandler): this => {
     this._handlers.push(handler);

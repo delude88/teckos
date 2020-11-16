@@ -1,6 +1,6 @@
 import {config} from 'dotenv';
 import * as uWS from 'uWebSockets.js';
-import {UWSProvider} from "../src";
+import {UWSProvider} from "teckos";
 
 config();
 
@@ -12,7 +12,7 @@ const io = new UWSProvider(uWS.App(), {
 io.onConnection((socket) => {
   socket.join("usergroup");
 
-  socket.on('token', (payload) => {
+  socket.on('token', (payload: any) => {
     if (payload.token === "mytoken") {
       console.log('Auth successful');
       io.toAll('HELLO', 'New user');

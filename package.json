@@ -1,12 +1,13 @@
 {
   "name": "teckos",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib/**/*",
-    "ext/**/*"
+    "ext/**/*",
+    "npm-scripts.js"
   ],
   "scripts": {
     "init": "git submodule update --init --recursive",

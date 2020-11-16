@@ -1,6 +1,6 @@
 import {config} from 'dotenv';
-import {UWSProvider} from "../lib";
-import * as uWs from '../lib/uWebSocket';
+import {UWSProvider} from 'teckos';
+import * as uWs from 'teckos/uWebSockets';
 
 config();
 

@@ -2,13 +2,13 @@ import * as IORedis from 'ioredis';
 import * as crypto from 'crypto';
 import * as Console from 'console';
 import debug from 'debug';
+import * as uWs from '../uWebSockets';
 import UWSSocket from './UWSSocket';
 import { encodePacket } from './util/Converter';
 import { TeckosPacketType } from './types/TeckosPacket';
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler';
 import ITeckosProvider from './types/ITeckosProvider';
 import { TeckosOptions } from './types/TeckosOptions';
-import * as uWs from '../lib/uWebSocket';
 
 const d = debug('teckos:provider');
 

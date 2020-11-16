@@ -5,7 +5,7 @@ import { decodePacket, encodePacket } from './util/Converter';
 import TeckosSocketEvent from './types/TeckosSocketEvent';
 import { TeckosPacket, TeckosPacketType } from './types/TeckosPacket';
 import ITeckosSocket from './types/ITeckosSocket';
-import * as uWs from '../lib/uWebSocket';
+import * as uWs from '../uWebSockets';
 
 const d = debug('teckos:socket');
 

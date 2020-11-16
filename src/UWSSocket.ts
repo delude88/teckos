@@ -1,10 +1,10 @@
 import debug from 'debug';
-import { WebSocket } from 'uWebSockets.js';
 import SocketEventEmitter from './SocketEventEmitter';
 import { decodePacket, encodePacket } from './util/Converter';
 import TeckosSocketEvent from './types/TeckosSocketEvent';
 import { TeckosPacket, TeckosPacketType } from './types/TeckosPacket';
 import ITeckosSocket from './types/ITeckosSocket';
+import * as uWs from '../uWebSockets';
 
 const d = debug('teckos:socket');
 const error = d.extend('error');
@@ -12,7 +12,7 @@ const error = d.extend('error');
 class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckosSocket {
   protected readonly _id: string;
 
-  protected readonly _ws: WebSocket;
+  protected readonly _ws: uWs.WebSocket;
 
   protected _fnId: number = 0;
 
@@ -30,11 +30,11 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     return this._id;
   }
 
-  get ws(): WebSocket {
+  get ws(): uWs.WebSocket {
     return this._ws;
   }
 
-  constructor(id: string, ws: WebSocket) {
+  constructor(id: string, ws: uWs.WebSocket) {
     super();
     this._id = id;
     this._ws = ws;

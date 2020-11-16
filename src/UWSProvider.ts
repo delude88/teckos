@@ -2,7 +2,7 @@ import * as IORedis from 'ioredis';
 import * as crypto from 'crypto';
 import * as Console from 'console';
 import debug from 'debug';
-import * as uWS from 'uWebSockets.js';
+import * as uWs from '../uWebSockets';
 import UWSSocket from './UWSSocket';
 import { encodePacket } from './util/Converter';
 import { TeckosPacketType } from './types/TeckosPacket';
@@ -22,7 +22,7 @@ function generateUUID(): string {
 }
 
 class UWSProvider implements ITeckosProvider {
-  private _app: uWS.TemplatedApp;
+  private _app: uWs.TemplatedApp;
 
   private readonly _options: TeckosOptions;
 
@@ -36,7 +36,7 @@ class UWSProvider implements ITeckosProvider {
 
   private _handlers: ITeckosSocketHandler[] = [];
 
-  constructor(app: uWS.TemplatedApp, options?: TeckosOptions) {
+  constructor(app: uWs.TemplatedApp, options?: TeckosOptions) {
     this._app = app;
     this._options = {
       redisUrl: options?.redisUrl || undefined,
@@ -74,12 +74,12 @@ class UWSProvider implements ITeckosProvider {
     }
     this._app.ws('/*', {
       /* Options */
-      compression: uWS.SHARED_COMPRESSOR,
+      compression: uWs.SHARED_COMPRESSOR,
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 0,
       maxBackpressure: 1024,
 
-      open: (ws) => {
+      open: (ws: uWs.WebSocket) => {
         const id: string = generateUUID();
         /* Let this client listen to all sensor topics */
 

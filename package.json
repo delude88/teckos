@@ -10,13 +10,11 @@
   ],
   "scripts": {
     "init": "git submodule update --init --recursive",
-    "build:ext": "make -C ./ext/uWebSockets && copyfiles -f ./ext/uWebSockets/dist/*.node ./uWebSockets && copyfiles ./ext/uWebSockets/dist/uws.js ./uWebSockets/index.js && copyfiles -f ./ext/uWebSockets/docs/index.d.ts ./uWebSockets",
-    "build:lib": "tsc --p tsconfig.json",
-    "build": "npm run build:ext && npm run build:lib",
     "lint": "npx eslint ./src --ext .js,.ts",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run lint",
-    "preversion": "npm run lint",
+    "build:ext": "node npm-scripts.js build:ext",
+    "build": "npm run init && npm run build:ext && tsc --p tsconfig.json",
+    "prepublishOnly": "npm run build && npm run lint",
+    "prepack": "rimraf uWebSockets",
     "version": "git add -A src",
     "postversion": "git push && git push --tags",
     "postinstall": "node npm-scripts.js postinstall"
@@ -49,6 +47,7 @@
     "eslint-config-airbnb-typescript": "^12.0.0",
     "eslint-plugin-import": "^2.22.1",
     "nodemon": "^2.0.6",
+    "rimraf": "^3.0.2",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
   },

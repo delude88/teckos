@@ -27,8 +27,9 @@ const copyFiles = (source, target) => {
 const copyFile = (source, target) => {
 		return new Promise((resolve, reject) => {
 				fs.copyFile(source, target, (error) => {
-						if( error)
+						if (error) {
 								reject(error);
+						}
 						resolve();
 				})
 		})
@@ -43,22 +44,22 @@ const copyExternals = () => {
 
 switch (task) {
 
+		case 'build:ext' :
 		case 'postinstall': {
 				if (!fs.existsSync("./uWebSockets")) {
+						console.log(`npm-scripts.js [INFO] Building uWebSocket.js ...`);
 						if (!isWindows) {
-								//execute('make -C ext/uWebSockets');
-								copyExternals()
-										.then(() => console.log("Copied!"))
+								execute('make -C ext/uWebSockets');
 						} else {
-								execute('nmake -C ext/uWebSockets');
-								ncp("ext/uWebSockets", destination, function(err) {
-										if (err) {
-												return console.error(err);
-										}
-										console.log('done!');
-								});
+								execute('cd ext/uWebSockets')
+								execute('nmake');
+								execute('cd ../..')
 						}
+						console.log(`npm-scripts.js [INFO] uWebSocket.js build!`);
 				}
+				console.log(`npm-scripts.js [INFO] Copying binaries ...`);
+				copyExternals()
+						.then(() => console.log(`npm-scripts.js [INFO] Binaries copied!`))
 				break;
 		}
 

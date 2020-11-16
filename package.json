@@ -8,7 +8,9 @@
     "lib/**/*"
   ],
   "scripts": {
+    "init": "git submodule update --init --recursive",
     "dev": "DEBUG=* nodemon --watch src --watch example -e ts --exec 'ts-node' --project tsconfig.example.json example/index.ts",
+    "build:ext": "make -C ./ext/uWebSockets && copyfiles -f ./ext/uWebSockets/dist/* ./lib/uWebSocket && copyfiles -f ./ext/uWebSockets/docs/index.d.ts ./lib/uWebSocket",
     "build:lib": "tsc --p tsconfig.json",
     "build:example": "tsc --p tsconfig.example.json",
     "build": "npm run build:lib",
@@ -54,7 +56,6 @@
   },
   "dependencies": {
     "debug": "^4.2.0",
-    "ioredis": "^4.19.2",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.10.0"
+    "ioredis": "^4.19.2"
   }
 }

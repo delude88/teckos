@@ -5,13 +5,15 @@
     "declaration": true,
     "sourceMap": true,
     "strict": true,
-    "outDir": "lib"
+    "outDir": "lib",
+    "allowJs": true
   },
   "lib": [
     "es2015"
   ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "ext/uWebSockets/dist/**/*"
   ],
   "exclude": [
     "./node_modules",

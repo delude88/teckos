@@ -11,7 +11,8 @@
   ],
   "include": [
     "example/**/*",
-    "src/**/*"
+    "src/**/*",
+    "ext/uWebSockets/dist/**/*"
   ],
   "exclude": [
     "node_modules",

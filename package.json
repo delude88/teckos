@@ -14,7 +14,7 @@
     "build:ext": "node npm-scripts.js build:ext",
     "build": "npm run init && npm run build:ext && tsc --p tsconfig.json",
     "prepublishOnly": "npm run build && npm run lint",
-    "prepack": "rimraf uWebSockets",
+    "prepack": "rimraf uWebSockets && rimraf ext/uWebSockets && npm run init",
     "version": "git add -A src",
     "postversion": "git push && git push --tags",
     "postinstall": "node npm-scripts.js postinstall"

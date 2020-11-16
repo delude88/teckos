@@ -46,7 +46,7 @@ switch (task) {
 
 		case 'build:ext' :
 		case 'postinstall': {
-				if (!fs.existsSync("./uWebSockets")) {
+				if (!fs.existsSync("./ext/uWebSockets/dist")) {
 						console.log(`npm-scripts.js [INFO] Building uWebSocket.js ...`);
 						if (!isWindows) {
 								execute('make -C ext/uWebSockets');

@@ -10,9 +10,9 @@
     "es2015"
   ],
   "include": [
+    "lib/**/*",
     "example/**/*",
-    "src/**/*",
-    "ext/uWebSockets/dist/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

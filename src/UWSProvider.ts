@@ -8,7 +8,7 @@ import { TeckosPacketType } from './types/TeckosPacket';
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler';
 import ITeckosProvider from './types/ITeckosProvider';
 import { TeckosOptions } from './types/TeckosOptions';
-import {SHARED_COMPRESSOR, TemplatedApp, WebSocket} from "../lib/uWebSocket";
+import * as uWs from '../lib/uWebSocket';
 
 const d = debug('teckos:provider');
 
@@ -22,7 +22,7 @@ function generateUUID(): string {
 }
 
 class UWSProvider implements ITeckosProvider {
-  private _app: TemplatedApp;
+  private _app: uWs.TemplatedApp;
 
   private readonly _options: TeckosOptions;
 
@@ -36,7 +36,7 @@ class UWSProvider implements ITeckosProvider {
 
   private _handlers: ITeckosSocketHandler[] = [];
 
-  constructor(app: TemplatedApp, options?: TeckosOptions) {
+  constructor(app: uWs.TemplatedApp, options?: TeckosOptions) {
     this._app = app;
     this._options = {
       redisUrl: options?.redisUrl || undefined,
@@ -74,12 +74,12 @@ class UWSProvider implements ITeckosProvider {
     }
     this._app.ws('/*', {
       /* Options */
-      compression: SHARED_COMPRESSOR,
+      compression: uWs.SHARED_COMPRESSOR,
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 0,
       maxBackpressure: 1024,
 
-      open: (ws: WebSocket) => {
+      open: (ws: uWs.WebSocket) => {
         const id: string = generateUUID();
         /* Let this client listen to all sensor topics */
 

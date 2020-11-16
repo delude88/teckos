@@ -1,12 +1,12 @@
 import {config} from 'dotenv';
-import {UWSProvider} from "../src";
-import {App} from "../src/ext/uWebSocket";
+import {UWSProvider} from "../lib";
+import * as uWs from '../lib/uWebSocket';
 
 config();
 
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 
-const io = new UWSProvider(App(), {
+const io = new UWSProvider(uWs.App(), {
   redisUrl: process.env.REDIS_URL,
   pingInterval: 2000,
   pingTimeout: 1000

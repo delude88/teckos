@@ -1,15 +1,13 @@
 import {config} from 'dotenv';
-import {UWSProvider} from 'teckos';
-import * as uWs from 'teckos/uWebSockets';
+import * as uWS from 'uWebSockets.js';
+import {UWSProvider} from "../src";
 
 config();
 
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 
-const io = new UWSProvider(uWs.App(), {
-  redisUrl: process.env.REDIS_URL,
-  pingInterval: 2000,
-  pingTimeout: 1000
+const io = new UWSProvider(uWS.App(), {
+  redisUrl: process.env.REDIS_URL
 });
 io.onConnection((socket) => {
   socket.join("usergroup");

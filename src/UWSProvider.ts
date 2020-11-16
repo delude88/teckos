@@ -88,8 +88,6 @@ class UWSProvider implements ITeckosProvider {
 
         // eslint-disable-next-line no-param-reassign
         ws.id = id;
-        // eslint-disable-next-line no-param-reassign
-        ws.alive = true;
         this._connections[id] = new UWSSocket(id, ws);
         try {
           this._handlers.forEach((handler) => handler(this._connections[id]));
@@ -98,7 +96,7 @@ class UWSProvider implements ITeckosProvider {
         }
       },
       pong: (ws) => {
-        d(`Got pong from ${ws.id}`);
+        d('PONG');
         // eslint-disable-next-line no-param-reassign
         ws.alive = true;
       },
@@ -128,7 +126,6 @@ class UWSProvider implements ITeckosProvider {
     setTimeout((connections: {
       [uuid: string]: UWSSocket
     }) => {
-      d('Ping clients');
       Object.keys(connections).forEach((uuid) => {
         if (this._connections[uuid].ws.alive) {
           this._connections[uuid].ws.alive = false;

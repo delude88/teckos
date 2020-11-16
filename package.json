@@ -1,24 +1,24 @@
 {
   "name": "teckos",
-  "version": "0.1.2",
+  "version": "0.0.7",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "lib/**/*",
-    "ext/**/*",
-    "npm-scripts.js"
+    "lib/**/*"
   ],
   "scripts": {
-    "init": "git submodule update --init --recursive",
+    "dev": "DEBUG=* nodemon --watch src --watch example -e ts --exec 'ts-node' --project tsconfig.example.json example/index.ts",
+    "build:lib": "tsc --p tsconfig.json",
+    "build:example": "tsc --p tsconfig.example.json",
+    "build": "npm run build:lib",
+    "start": "npm run build:example && node ./dist/example/index.js",
     "lint": "npx eslint ./src --ext .js,.ts",
-    "build:ext": "node npm-scripts.js build:ext",
-    "build": "npm run init && npm run build:ext && tsc --p tsconfig.json",
-    "prepublishOnly": "npm run build && npm run lint",
-    "prepack": "rimraf uWebSockets && rimraf ext/uWebSockets && npm run init",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint",
+    "preversion": "npm run lint",
     "version": "git add -A src",
-    "postversion": "git push && git push --tags",
-    "postinstall": "node npm-scripts.js postinstall"
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -41,8 +41,10 @@
     "@types/ioredis": "^4.17.8",
     "@types/lodash": "^4.14.165",
     "@types/node": "^14.14.7",
-    "@typescript-eslint/eslint-plugin": "^4.8.0",
-    "@typescript-eslint/parser": "^4.8.0",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
+    "copyfiles": "^2.4.0",
+    "dotenv": "^8.2.0",
     "eslint": "^7.13.0",
     "eslint-config-airbnb-typescript": "^12.0.0",
     "eslint-plugin-import": "^2.22.1",
@@ -53,8 +55,6 @@
   "dependencies": {
     "debug": "^4.2.0",
     "ioredis": "^4.19.2",
-    "dotenv": "^8.2.0",
-    "copyfiles": "^2.4.0",
-    "rimraf": "^3.0.2"
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.10.0"
   }
 }

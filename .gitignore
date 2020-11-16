@@ -106,3 +106,5 @@ dist
 /lib
 
 .idea
+
+uWebSockets

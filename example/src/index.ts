@@ -1,18 +1,20 @@
 import {config} from 'dotenv';
-import * as uWS from 'uWebSockets.js';
-import {UWSProvider} from "teckos";
+import {UWSProvider} from 'teckos';
+import * as uWs from 'teckos/uWebSockets';
 
 config();
 
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 
-const io = new UWSProvider(uWS.App(), {
-  redisUrl: process.env.REDIS_URL
+const io = new UWSProvider(uWs.App(), {
+  redisUrl: process.env.REDIS_URL,
+  pingInterval: 2000,
+  pingTimeout: 1000
 });
 io.onConnection((socket) => {
   socket.join("usergroup");
 
-  socket.on('token', (payload: any) => {
+  socket.on('token', (payload) => {
     if (payload.token === "mytoken") {
       console.log('Auth successful');
       io.toAll('HELLO', 'New user');

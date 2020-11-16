@@ -2,7 +2,7 @@ import * as IORedis from 'ioredis';
 import * as crypto from 'crypto';
 import * as Console from 'console';
 import debug from 'debug';
-import * as uWs from 'uWebSockets.js';
+import * as uWs from '../uWebSockets';
 import UWSSocket from './UWSSocket';
 import { encodePacket } from './util/Converter';
 import { TeckosPacketType } from './types/TeckosPacket';
@@ -88,6 +88,8 @@ class UWSProvider implements ITeckosProvider {
 
         // eslint-disable-next-line no-param-reassign
         ws.id = id;
+        // eslint-disable-next-line no-param-reassign
+        ws.alive = true;
         this._connections[id] = new UWSSocket(id, ws);
         try {
           this._handlers.forEach((handler) => handler(this._connections[id]));
@@ -96,7 +98,7 @@ class UWSProvider implements ITeckosProvider {
         }
       },
       pong: (ws) => {
-        d('PONG');
+        d(`Got pong from ${ws.id}`);
         // eslint-disable-next-line no-param-reassign
         ws.alive = true;
       },
@@ -126,6 +128,7 @@ class UWSProvider implements ITeckosProvider {
     setTimeout((connections: {
       [uuid: string]: UWSSocket
     }) => {
+      d('Ping clients');
       Object.keys(connections).forEach((uuid) => {
         if (this._connections[uuid].ws.alive) {
           this._connections[uuid].ws.alive = false;

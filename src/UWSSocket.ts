@@ -1,10 +1,10 @@
 import debug from 'debug';
-import * as uWs from 'uWebSockets.js';
 import SocketEventEmitter from './SocketEventEmitter';
 import { decodePacket, encodePacket } from './util/Converter';
 import TeckosSocketEvent from './types/TeckosSocketEvent';
 import { TeckosPacket, TeckosPacketType } from './types/TeckosPacket';
 import ITeckosSocket from './types/ITeckosSocket';
+import * as uWs from '../uWebSockets';
 
 const d = debug('teckos:socket');
 const error = d.extend('error');
@@ -19,6 +19,8 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
   protected _acks: Map<number, (...args: any[]) => void> = new Map();
 
   protected _maxListeners: number = 50;
+
+  public _alive: boolean = true;
 
   _handlers: {
     [event: string]: ((...args: any[]) => void)[]

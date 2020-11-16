@@ -1,9 +1,14 @@
 import { TeckosPacket } from '../types/TeckosPacket';
 
 const encodePacket = (packet: TeckosPacket): Buffer => Buffer.from(JSON.stringify(packet));
-const decodePacket = (buffer: ArrayBuffer): TeckosPacket => JSON.parse(
-  Buffer.from(buffer).toString(),
-);
+const decodePacket = (buffer: ArrayBuffer): TeckosPacket => {
+  const str = Buffer.from(buffer).toString();
+  try {
+    return JSON.parse(str);
+  } catch (error) {
+    throw new Error(`Invalid packet format: ${str}`);
+  }
+};
 export {
   encodePacket,
   decodePacket,

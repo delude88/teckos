@@ -1,4 +1,3 @@
-import * as Console from 'console';
 import debug from 'debug';
 import { WebSocket } from 'uWebSockets.js';
 import SocketEventEmitter from './SocketEventEmitter';
@@ -8,6 +7,7 @@ import { TeckosPacket, TeckosPacketType } from './types/TeckosPacket';
 import ITeckosSocket from './types/ITeckosSocket';
 
 const d = debug('teckos:socket');
+const error = d.extend('error');
 
 class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckosSocket {
   protected readonly _id: string;
@@ -104,35 +104,40 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
   };
 
   onMessage = (buffer: ArrayBuffer) => {
-    const packet = decodePacket(buffer);
-    d(`Got packet from ${this._id}: ${packet.data}`);
+    try {
+      const packet = decodePacket(buffer);
 
-    if (packet.type === TeckosPacketType.EVENT) {
-      const event = packet.data[0];
-      if (this._handlers[event]) {
-        const args = packet.data.slice(1);
+      d(`Got packet from ${this._id}: ${packet.data}`);
 
-        if (packet.id !== undefined) {
-          // Replace last arg with callback
-          args.push(this._ack(packet.id));
+      if (packet.type === TeckosPacketType.EVENT) {
+        const event = packet.data[0];
+        if (this._handlers[event]) {
+          const args = packet.data.slice(1);
+
+          if (packet.id !== undefined) {
+            // Replace last arg with callback
+            args.push(this._ack(packet.id));
+          }
+
+          try {
+            this._handlers[event].forEach((handler) => handler(...args));
+          } catch (eventError) {
+            error(eventError);
+          }
         }
-
-        try {
-          this._handlers[event].forEach((handler) => handler(...args));
-        } catch (eventError) {
-          console.error(eventError);
+      } else if (packet.type === TeckosPacketType.ACK
+        && packet.id !== undefined) {
+        // Call assigned function
+        const ack = this._acks.get(packet.id);
+        if (typeof ack === 'function') {
+          ack.apply(this, packet.data);
+          this._acks.delete(packet.id);
         }
+      } else {
+        error(`Unknown packet: ${packet.type}`);
       }
-    } else if (packet.type === TeckosPacketType.ACK
-      && packet.id !== undefined) {
-      // Call assigned function
-      const ack = this._acks.get(packet.id);
-      if (typeof ack === 'function') {
-        ack.apply(this, packet.data);
-        this._acks.delete(packet.id);
-      }
-    } else {
-      Console.error(`Unknown packet: ${packet.type}`);
+    } catch (messageError) {
+      error(messageError);
     }
   };
 

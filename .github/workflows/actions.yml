@@ -9,20 +9,21 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Update binaries
+      - name: Check build
         run: |
           $ErrorActionPreference = 'SilentlyContinue'
           git clone --recursive https://github.com/delude88/teckos.git
           cd teckos
           npm install
           npm run build
+          npm run lint
   build-unix:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-11.0, ubuntu-latest]
     steps:
-      - name: Update binaries
+      - name: Check build
         run: |
           sudo xcode-select -switch /Applications/Xcode_12.2.app || true
           sudo apt update || true
@@ -31,3 +32,4 @@ jobs:
           cd teckos
           npm install
           npm run build
+          npm run lint

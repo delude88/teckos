@@ -7,7 +7,9 @@ config();
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 
 const io = new UWSProvider(uWS.App(), {
-  redisUrl: process.env.REDIS_URL
+  redisUrl: process.env.REDIS_URL,
+  pingInterval: 2000,
+  pingTimeout: 1000
 });
 io.onConnection((socket) => {
   socket.join("usergroup");

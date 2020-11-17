@@ -5,18 +5,22 @@ on:
     branches: [ master ]
 
 jobs:
-#  build-windows:
-#    runs-on: windows-latest
-#    steps:
-#      - uses: ilammy/msvc-dev-cmd@v1
-#      - name: Check build
-#        run: |
-#          $ErrorActionPreference = 'SilentlyContinue'
-#          git clone --recursive https://github.com/delude88/teckos.git
-#          cd teckos
-#          npm install
-#          npm run build
-#          npm run lint
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Check build
+        run: |
+          $ErrorActionPreference = 'SilentlyContinue'
+          git clone --recursive https://github.com/delude88/teckos.git
+          cd teckos
+          npm install
+          npm run build
+          npm run lint
+          cd example
+          npm install
+          npm run build
+          npm run lint
   build-unix:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -25,11 +29,12 @@ jobs:
     steps:
       - name: Check build
         run: |
-          sudo xcode-select -switch /Applications/Xcode_12.2.app || true
-          sudo apt update || true
-          sudo apt install -y g++-aarch64-linux-gnu || true
           git clone --recursive https://github.com/delude88/teckos.git
           cd teckos
+          npm install
+          npm run build
+          npm run lint
+          cd example
           npm install
           npm run build
           npm run lint

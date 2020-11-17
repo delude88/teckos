@@ -1,5 +1,5 @@
 import {config} from 'dotenv';
-import * as uWS from 'uWebSockets.js';
+import * as uWS from 'teckos/uws';
 import {UWSProvider} from "teckos";
 
 config();

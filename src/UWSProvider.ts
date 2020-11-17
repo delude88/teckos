@@ -2,7 +2,7 @@ import * as IORedis from 'ioredis';
 import * as crypto from 'crypto';
 import * as Console from 'console';
 import debug from 'debug';
-import * as uWs from 'uWebSockets.js';
+import * as uWs from '../uws';
 import UWSSocket from './UWSSocket';
 import { encodePacket } from './util/Converter';
 import { TeckosPacketType } from './types/TeckosPacket';

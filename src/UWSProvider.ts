@@ -88,6 +88,8 @@ class UWSProvider implements ITeckosProvider {
 
         // eslint-disable-next-line no-param-reassign
         ws.id = id;
+        // eslint-disable-next-line no-param-reassign
+        ws.alive = true;
         this._connections[id] = new UWSSocket(id, ws);
         try {
           this._handlers.forEach((handler) => handler(this._connections[id]));
@@ -96,7 +98,6 @@ class UWSProvider implements ITeckosProvider {
         }
       },
       pong: (ws) => {
-        d('PONG');
         // eslint-disable-next-line no-param-reassign
         ws.alive = true;
       },
@@ -112,6 +113,7 @@ class UWSProvider implements ITeckosProvider {
       },
       close: (ws) => {
         if (this._connections[ws.id]) {
+          d(`Client ${ws.id} disconnected, removing from registry`);
           this._connections[ws.id].onDisconnect();
           delete this._connections[ws.id];
         }
@@ -129,10 +131,10 @@ class UWSProvider implements ITeckosProvider {
       Object.keys(connections).forEach((uuid) => {
         if (this._connections[uuid].ws.alive) {
           this._connections[uuid].ws.alive = false;
-          this._connections[uuid].ws.ping();
+          this._connections[uuid].ws.ping('hey');
         } else {
           // Terminate connection
-          d(`Ping pong timeout for ${uuid}`);
+          d(`Ping pong timeout for ${uuid}, disconnecting client...`);
           this._connections[uuid].disconnect();
         }
       });

@@ -1,12 +1,13 @@
 {
   "name": "teckos-example",
   "version": "0.0.1",
-  "description": "",
+  "description": "Example using the teckos server library",
   "main": "src/index.ts",
   "scripts": {
     "dev": "DEBUG=* nodemon --watch src -e ts --exec 'ts-node' --project tsconfig.json src/index.ts",
     "build": "tsc --p tsconfig.json",
-    "lint": "npx eslint ./src --ext .ts",
+    "lint": "npx eslint ./src --ext .ts --resolve-plugins-relative-to .",
+    "lint:fix": "npx eslint ./src --ext .ts --resolve-plugins-relative-to . --fix",
     "start": "npm run build && node ./dist/index.js"
   },
   "author": "Tobias Hegemann <tobias.hegemann@googlemail.com>",

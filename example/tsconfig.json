@@ -10,14 +10,10 @@
     "es2015"
   ],
   "include": [
-    "lib/**/*",
-    "example/**/*",
     "src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "./tests",
-    "./dist",
-    "./backup"
+    "./dist"
   ]
 }

@@ -9,14 +9,15 @@
     "npm-scripts.js"
   ],
   "scripts": {
+    "init": "node npm-scripts.js",
     "build": "tsc --p tsconfig.json",
     "lint": "npx eslint ./src --ext .js,.ts",
-    "prepare": "npm run build",
+    "prepare": "npm run init && npm run build",
     "preversion": "npm run lint",
     "version": "git add -A src",
     "postversion": "git push && git push --tags",
     "prepublishOnly": "rm -rf uws binaries.zip",
-    "preinstall": "node npm-scripts.js"
+    "preinstall": "npm run init"
   },
   "repository": {
     "type": "git",

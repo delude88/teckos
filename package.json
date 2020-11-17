@@ -1,6 +1,6 @@
 {
   "name": "teckos",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

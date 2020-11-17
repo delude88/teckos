@@ -17,7 +17,7 @@
     "version": "git add -A src",
     "postversion": "git push && git push --tags",
     "prepublishOnly": "rm -rf uws binaries.zip",
-    "preinstall": "npm run init"
+    "postinstall": "npm run init"
   },
   "repository": {
     "type": "git",

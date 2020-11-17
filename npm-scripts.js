@@ -23,6 +23,10 @@ const buildBinaries = async () => {
     if( !fs.existsSync("./binaries.zip") ) {
         console.log("Downloading binaries...")
         await download("https://github.com/uNetworking/uWebSockets.js/archive/v" + U_WEBSOCKET_VERSION + ".zip", "binaries.zip")
+            .catch((error) => {
+                fs.rmSync("./binaries.zip");
+                console.error(error);
+            })
     }
     if( !fs.existsSync("./uws") ) {
         console.log("Extracting binaries...")

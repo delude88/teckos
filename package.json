@@ -15,7 +15,7 @@
     "preversion": "npm run lint",
     "version": "git add -A src",
     "postversion": "git push && git push --tags",
-    "prepublishOnly": "rm -rf uws",
+    "prepublishOnly": "rm -rf uws binaries.zip",
     "preinstall": "node npm-scripts.js"
   },
   "repository": {

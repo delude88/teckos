@@ -2,7 +2,7 @@ const fs = require('fs');
 const Axios = require('axios');
 const AdmZip = require('adm-zip');
 
-const U_WEBSOCKET_VERSION = "18.10.0";
+const U_WEBSOCKET_VERSION = "18.14.0";
 
 const download = async (url, dest) => {
     const writer = fs.createWriteStream(dest)

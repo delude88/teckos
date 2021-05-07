@@ -43,6 +43,7 @@ class UWSProvider implements ITeckosProvider {
             redisUrl: options?.redisUrl || undefined,
             pingInterval: options?.pingInterval || DEFAULT_OPTION.pingInterval,
             pingTimeout: options?.pingInterval || DEFAULT_OPTION.pingTimeout,
+            debug: options?.debug,
         }
 
         const { redisUrl } = this._options

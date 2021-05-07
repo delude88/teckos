@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^9.0.0",
-    "teckos": "file:.."
+    "teckos": "file:../"
   },
   "prettier": {
     "printWidth": 100,

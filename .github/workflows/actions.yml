@@ -34,9 +34,3 @@ jobs:
           yarn install
           yarn build
           yarn lint
-          yarn link
-          cd example
-          yarn link "teckos"
-          yarn install
-          yarn build
-          yarn lint

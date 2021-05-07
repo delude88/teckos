@@ -34,3 +34,7 @@ jobs:
           yarn install
           yarn build
           yarn lint
+          cd example
+          npm install
+          npm run build
+          npm run lint

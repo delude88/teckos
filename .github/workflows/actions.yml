@@ -8,6 +8,8 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Check build
         run: |
@@ -25,6 +27,8 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest]
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
       - name: Check build
         run: |
           npm install

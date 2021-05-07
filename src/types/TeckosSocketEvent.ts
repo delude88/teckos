@@ -1,8 +1,8 @@
 interface BaseTeckosSocketEvent {
-  reconnect: 'reconnect',
-  disconnect: 'disconnect',
+    reconnect: 'reconnect'
+    disconnect: 'disconnect'
 }
 
-type TeckosSocketEvent = BaseTeckosSocketEvent[keyof BaseTeckosSocketEvent] | string;
+type TeckosSocketEvent = BaseTeckosSocketEvent[keyof BaseTeckosSocketEvent] | string
 
-export default TeckosSocketEvent;
+export default TeckosSocketEvent

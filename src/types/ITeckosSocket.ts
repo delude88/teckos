@@ -1,25 +1,25 @@
-import * as events from 'events';
-import TeckosSocketEvent from './TeckosSocketEvent';
+import * as events from 'events'
+import TeckosSocketEvent from './TeckosSocketEvent'
 
 interface ITeckosSocket extends events.EventEmitter {
-  id: string;
+    id: string
 
-  on(event: TeckosSocketEvent, listener: (...args: any[]) => void): this;
+    on(event: TeckosSocketEvent, listener: (...args: any[]) => void): this
 
-  once(event: TeckosSocketEvent, listener: (...args: any[]) => void): this;
+    once(event: TeckosSocketEvent, listener: (...args: any[]) => void): this
 
-  off(event: TeckosSocketEvent, listener: (...args: any[]) => void): this;
+    off(event: TeckosSocketEvent, listener: (...args: any[]) => void): this
 
-  join(group: string): this;
+    join(group: string): this
 
-  leave(group: string): this;
+    leave(group: string): this
 
-  leaveAll(): this;
+    leaveAll(): this
 
-  error(message?: string): boolean;
+    error(message?: string): boolean
 
-  disconnect(): this;
+    disconnect(): this
 
-  getUserData(key: string): any;
+    getUserData(key: string): any
 }
-export default ITeckosSocket;
+export default ITeckosSocket

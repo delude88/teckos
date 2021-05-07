@@ -1,5 +1,6 @@
 export interface TeckosOptions {
-  redisUrl?: string
-  pingInterval?: number;
-  pingTimeout?: number;
+    redisUrl?: string
+    pingInterval?: number
+    pingTimeout?: number
+    debug?: boolean
 }

@@ -31,10 +31,12 @@ jobs:
         uses: actions/checkout@v2
       - name: Check build
         run: |
-          npm install
-          npm run build
-          npm run lint
+          yarn install
+          yarn build
+          yarn lint
+          yarn link
           cd example
-          npm install
-          npm run build
-          npm run lint
+          yarn link "teckos"
+          yarn install
+          yarn build
+          yarn lint

@@ -71,7 +71,7 @@ class UWSProvider implements ITeckosProvider {
             // no further checks are necessary (trusting ioredis here)
             this._sub.on('pmessage', (channel, pattern, message) => {
                 const group = pattern.substr(2)
-                verbose(`Publishing message from REDIS to group ${group}`)
+                if (this._options.debug) verbose(`Publishing message from REDIS to group ${group}`)
                 this._app.publish(group, message)
             })
         }
@@ -112,11 +112,12 @@ class UWSProvider implements ITeckosProvider {
                 }
             },
             drain: (ws) => {
-                verbose(`Drain: ${ws.id}`)
+                if (options?.debug) verbose(`Drain: ${ws.id}`)
             },
             close: (ws) => {
                 if (this._connections[ws.id]) {
-                    verbose(`Client ${ws.id} disconnected, removing from registry`)
+                    if (this._options.debug)
+                        verbose(`Client ${ws.id} disconnected, removing from registry`)
                     this._connections[ws.id].onDisconnect()
                     delete this._connections[ws.id]
                 }
@@ -136,7 +137,8 @@ class UWSProvider implements ITeckosProvider {
                         this._connections[uuid].ws.ping('hey')
                     } else {
                         // Terminate connection
-                        verbose(`Ping pong timeout for ${uuid}, disconnecting client...`)
+                        if (this._options.debug)
+                            verbose(`Ping pong timeout for ${uuid}, disconnecting client...`)
                         this._connections[uuid].disconnect()
                     }
                 })
@@ -161,7 +163,7 @@ class UWSProvider implements ITeckosProvider {
         if (this._pub) {
             this._pub.publishBuffer('a', buffer)
         } else {
-            verbose(`Publishing event ${event} to group a`)
+            if (this._options.debug) verbose(`Publishing event ${event} to group a`)
             this._app.publish('a', buffer)
         }
         return this
@@ -176,7 +178,7 @@ class UWSProvider implements ITeckosProvider {
         if (this._pub) {
             this._pub.publishBuffer(`g.${group}`, buffer)
         } else {
-            verbose(`Publishing event ${event} to group ${group}`)
+            if (this._options.debug) verbose(`Publishing event ${event} to group ${group}`)
             this._app.publish(group, buffer)
         }
         return this

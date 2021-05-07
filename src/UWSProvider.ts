@@ -1,4 +1,4 @@
-import * as IORedis from 'ioredis'
+import IORedis from 'ioredis'
 import * as crypto from 'crypto'
 import debug from 'debug'
 import * as uWs from '../uws'
@@ -69,7 +69,7 @@ class UWSProvider implements ITeckosProvider {
             })
             // Since we are only p-subscribing to g.*,
             // no further checks are necessary (trusting ioredis here)
-            this._sub.on('pmessage', (channel, pattern, message) => {
+            this._sub.on('pmessage', (_channel, pattern, message) => {
                 const group = pattern.substr(2)
                 if (this._options.debug) verbose(`Publishing message from REDIS to group ${group}`)
                 this._app.publish(group, message)

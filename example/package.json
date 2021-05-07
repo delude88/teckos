@@ -16,6 +16,13 @@
     "dotenv": "^9.0.0",
     "teckos": "file:.."
   },
+  "prettier": {
+    "printWidth": 100,
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 4,
+    "trailingComma": "es5"
+  },
   "devDependencies": {
     "@types/node": "^15.0.2",
     "@typescript-eslint/eslint-plugin": "^4.22.1",

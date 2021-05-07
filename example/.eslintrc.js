@@ -6,5 +6,6 @@ module.exports = {
     },
     parserOptions: {
         project: './tsconfig.json'
-    }
+    },
+    "root": true
 };

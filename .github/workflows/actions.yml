@@ -12,8 +12,6 @@ jobs:
       - name: Check build
         run: |
           $ErrorActionPreference = 'SilentlyContinue'
-          git clone --recursive https://github.com/delude88/teckos.git
-          cd teckos
           npm install
           npm run build
           npm run lint
@@ -29,8 +27,6 @@ jobs:
     steps:
       - name: Check build
         run: |
-          git clone --recursive https://github.com/delude88/teckos.git
-          cd teckos
           npm install
           npm run build
           npm run lint

@@ -38,6 +38,7 @@ class UWSProvider implements ITeckosProvider {
     private _handlers: ITeckosSocketHandler[] = []
 
     constructor(app: uWs.TemplatedApp, options?: TeckosOptions) {
+        console.log('HELLO WORLD!')
         this._app = app
         this._options = {
             redisUrl: options?.redisUrl || undefined,
@@ -45,6 +46,8 @@ class UWSProvider implements ITeckosProvider {
             pingTimeout: options?.pingInterval || DEFAULT_OPTION.pingTimeout,
             debug: options?.debug,
         }
+        d('HELLO?!?')
+        if (this._options.debug) d('DEBUG!!!')
 
         const { redisUrl } = this._options
         if (redisUrl) {

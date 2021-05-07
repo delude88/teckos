@@ -39,6 +39,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
         this._id = id
         this._ws = ws
         this._debug = verbose
+        if (this._debug) d('DEBUG!!!')
     }
 
     join = (group: string): this => {

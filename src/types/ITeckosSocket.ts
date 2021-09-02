@@ -1,7 +1,7 @@
 import * as events from 'events'
 import { TeckosSocketEvent } from './TeckosSocketEvent'
 
-interface ITeckosSocket extends events.EventEmitter {
+export interface ITeckosSocket extends events.EventEmitter {
     id: string
 
     on(event: TeckosSocketEvent, listener: (...args: any[]) => void): this
@@ -20,4 +20,3 @@ interface ITeckosSocket extends events.EventEmitter {
 
     getUserData(key: string): any
 }
-export type { ITeckosSocket }

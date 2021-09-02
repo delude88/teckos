@@ -1,5 +1,5 @@
 import debug from 'debug'
-import * as uWs from '../uws'
+import * as uWs from './../uws'
 import { SocketEventEmitter } from './SocketEventEmitter'
 import { decodePacket, encodePacket } from './util/Converter'
 import { TeckosSocketEvent } from './types/TeckosSocketEvent'

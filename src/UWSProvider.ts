@@ -1,7 +1,7 @@
 import IORedis from 'ioredis'
 import * as crypto from 'crypto'
 import debug from 'debug'
-import * as uWs from './../uws/uws'
+import * as uWs from './../uws'
 import { UWSSocket } from './UWSSocket'
 import { encodePacket } from './util/Converter'
 import { TeckosPacketType } from './types/TeckosPacket'

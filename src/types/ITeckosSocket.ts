@@ -1,5 +1,5 @@
 import * as events from 'events'
-import TeckosSocketEvent from './TeckosSocketEvent'
+import { TeckosSocketEvent } from './TeckosSocketEvent'
 
 interface ITeckosSocket extends events.EventEmitter {
     id: string
@@ -14,12 +14,10 @@ interface ITeckosSocket extends events.EventEmitter {
 
     leave(group: string): this
 
-    leaveAll(): this
-
     error(message?: string): boolean
 
     disconnect(): this
 
     getUserData(key: string): any
 }
-export default ITeckosSocket
+export type { ITeckosSocket }

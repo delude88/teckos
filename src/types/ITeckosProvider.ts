@@ -8,4 +8,4 @@ interface ITeckosProvider {
     to(group: string, event: string, payload: any): this
 }
 
-export default ITeckosProvider
+export type { ITeckosProvider }

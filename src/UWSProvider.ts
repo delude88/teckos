@@ -2,11 +2,11 @@ import IORedis from 'ioredis'
 import * as crypto from 'crypto'
 import debug from 'debug'
 import * as uWs from '../uws'
-import UWSSocket from './UWSSocket'
+import { UWSSocket } from './UWSSocket'
 import { encodePacket } from './util/Converter'
 import { TeckosPacketType } from './types/TeckosPacket'
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler'
-import ITeckosProvider from './types/ITeckosProvider'
+import { ITeckosProvider } from './types/ITeckosProvider'
 import { TeckosOptions } from './types/TeckosOptions'
 
 const d = debug('teckos:provider')
@@ -48,7 +48,7 @@ class UWSProvider implements ITeckosProvider {
 
         const { redisUrl } = this._options
         if (redisUrl) {
-            d(`Using REDIS at ${this._options.redisUrl}`)
+            d(`Using REDIS at ${redisUrl}`)
             this._pub = new IORedis(redisUrl)
             this._sub = new IORedis(redisUrl)
 
@@ -59,7 +59,7 @@ class UWSProvider implements ITeckosProvider {
             })
             // Since we are only subscribing to a,
             // no further checks are necessary (trusting ioredis here)
-            this._sub.on('message', (channel, message) =>
+            this._sub.on('message', (channel: string, message: Buffer | string) =>
                 this._app.publish(channel.substr(2), message)
             )
 
@@ -70,7 +70,7 @@ class UWSProvider implements ITeckosProvider {
             })
             // Since we are only p-subscribing to g.*,
             // no further checks are necessary (trusting ioredis here)
-            this._sub.on('pmessage', (_channel, pattern, message) => {
+            this._sub.on('pmessage', (_channel, pattern: string, message: Buffer | string) => {
                 const group = pattern.substr(2)
                 if (this._options.debug) verbose(`Publishing message from REDIS to group ${group}`)
                 this._app.publish(group, message)
@@ -96,7 +96,9 @@ class UWSProvider implements ITeckosProvider {
                 ws.alive = true
                 this._connections[id] = new UWSSocket(id, ws, options?.debug)
                 try {
-                    this._handlers.forEach((handler) => handler(this._connections[id]))
+                    this._handlers.forEach((handler) => {
+                        handler(this._connections[id])
+                    })
                 } catch (handlerError) {
                     error(handlerError)
                 }
@@ -105,22 +107,29 @@ class UWSProvider implements ITeckosProvider {
                 // eslint-disable-next-line no-param-reassign
                 ws.alive = true
             },
-            message: (ws, buffer) => {
-                if (this._connections[ws.id]) {
-                    this._connections[ws.id].onMessage(buffer)
+            message: (ws: uWs.WebSocket, buffer: ArrayBuffer) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                const id = ws.id as string
+                if (this._connections[id]) {
+                    this._connections[id].onMessage(buffer)
                 } else {
-                    error(`Got message from unknown connection: ${ws.id}`)
+                    error(`Got message from unknown connection: ${id}`)
                 }
             },
-            drain: (ws) => {
-                if (options?.debug) verbose(`Drain: ${ws.id}`)
+            drain: (ws: uWs.WebSocket) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                const id = ws.id as string
+                if (options?.debug) verbose(`Drain: ${id}`)
             },
-            close: (ws) => {
-                if (this._connections[ws.id]) {
-                    if (this._options.debug)
-                        verbose(`Client ${ws.id} disconnected, removing from registry`)
-                    this._connections[ws.id].onDisconnect()
-                    delete this._connections[ws.id]
+            close: (ws: uWs.WebSocket) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                const id = ws.id as string
+                if (this._connections[id]) {
+                    if (this._options.debug) {
+                        verbose(`Client ${id} disconnected, removing from registry`)
+                    }
+                    this._connections[id].onDisconnect()
+                    delete this._connections[id]
                 }
             },
         })
@@ -162,7 +171,7 @@ class UWSProvider implements ITeckosProvider {
             data: args,
         })
         if (this._pub) {
-            this._pub.publishBuffer('a', buffer)
+            this._pub.publishBuffer('a', buffer).catch((err) => error(err))
         } else {
             if (this._options.debug) verbose(`Publishing event ${event} to group a`)
             this._app.publish('a', buffer)
@@ -177,7 +186,7 @@ class UWSProvider implements ITeckosProvider {
             data: args,
         })
         if (this._pub) {
-            this._pub.publishBuffer(`g.${group}`, buffer)
+            this._pub.publishBuffer(`g.${group}`, buffer).catch((err) => error(err))
         } else {
             if (this._options.debug) verbose(`Publishing event ${event} to group ${group}`)
             this._app.publish(group, buffer)
@@ -196,4 +205,4 @@ class UWSProvider implements ITeckosProvider {
         })
 }
 
-export default UWSProvider
+export { UWSProvider }

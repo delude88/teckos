@@ -4,7 +4,7 @@ const encodePacket = (packet: TeckosPacket): Buffer => Buffer.from(JSON.stringif
 const decodePacket = (buffer: ArrayBuffer): TeckosPacket => {
     const str = Buffer.from(buffer).toString()
     try {
-        return JSON.parse(str)
+        return JSON.parse(str) as TeckosPacket
     } catch (error) {
         throw new Error(`Invalid packet format: ${str}`)
     }

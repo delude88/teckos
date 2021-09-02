@@ -5,4 +5,4 @@ interface BaseTeckosSocketEvent {
 
 type TeckosSocketEvent = BaseTeckosSocketEvent[keyof BaseTeckosSocketEvent] | string
 
-export default TeckosSocketEvent
+export type { TeckosSocketEvent }

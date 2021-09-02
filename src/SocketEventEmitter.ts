@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 
 class SocketEventEmitter<T extends string> extends EventEmitter {
-    protected _maxListeners: number = 10
+    protected _maxListeners = 10
 
     protected _handlers: {
         [event: string]: ((...args: any[]) => void)[]
@@ -55,14 +55,14 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
 
     public getMaxListeners = (): number => this._maxListeners
 
-    public listeners = (event: T): Function[] => {
+    public listeners = (event: T): ((...args: any[]) => void)[] => {
         if (this._handlers[event]) {
             return [...this._handlers[event]]
         }
         return []
     }
 
-    public rawListeners = (event: T): Function[] => [...this._handlers[event]]
+    public rawListeners = (event: T): ((...args: any[]) => void)[] => [...this._handlers[event]]
 
     public listenerCount = (event: T): number => {
         if (this._handlers[event]) {
@@ -108,4 +108,4 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
     }
 }
 
-export default SocketEventEmitter
+export { SocketEventEmitter }

@@ -1,6 +1,6 @@
-const fs = require('fs');
-const Axios = require('axios');
-const AdmZip = require('adm-zip');
+import fs from "fs";
+import Axios from "axios";
+import AdmZip from "adm-zip";
 
 const U_WEBSOCKET_VERSION = "19.3.0";
 

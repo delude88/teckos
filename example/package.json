@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Example using the teckos server library",
   "main": "src/index.ts",
+  "type": "module",
   "scripts": {
     "dev": "DEBUG=* nodemon --watch src -e ts --exec 'ts-node' --project tsconfig.json src/index.ts",
     "build": "tsc --p tsconfig.json",
@@ -14,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^9.0.0",
-    "teckos": "file:../"
+    "teckos": "file:.."
   },
   "prettier": {
     "printWidth": 100,

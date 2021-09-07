@@ -1,10 +1,11 @@
-import debug from 'debug'
-import * as uWs from 'uwebsocketjs'
+import { WebSocket } from './uws'
 import { SocketEventEmitter } from './SocketEventEmitter'
 import { decodePacket, encodePacket } from './util/Converter'
 import { TeckosSocketEvent } from './types/TeckosSocketEvent'
-import { TeckosPacket, TeckosPacketType } from './types/TeckosPacket'
+import { TeckosPacket } from './types/TeckosPacket'
 import { ITeckosSocket } from './types/ITeckosSocket'
+import { ACK, EVENT } from './types/TeckosPacketType'
+import * as debug from 'debug'
 
 const d = debug('teckos:socket')
 const error = d.extend('error')
@@ -12,7 +13,7 @@ const error = d.extend('error')
 class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckosSocket {
     protected readonly _id: string
 
-    protected readonly _ws: uWs.WebSocket
+    protected readonly _ws: WebSocket
 
     protected _fnId = 0
 
@@ -26,15 +27,15 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
         [event: string]: ((...args: any[]) => void)[]
     } = {}
 
-    get id(): string {
+    id = (): string => {
         return this._id
     }
 
-    get ws(): uWs.WebSocket {
+    ws = (): WebSocket => {
         return this._ws
     }
 
-    constructor(id: string, ws: uWs.WebSocket, verbose?: boolean) {
+    constructor(id: string, ws: WebSocket, verbose?: boolean) {
         super()
         this._id = id
         this._ws = ws
@@ -56,7 +57,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     send = (...args: any[]): boolean => {
         args.unshift('message')
         return this._send({
-            type: TeckosPacketType.EVENT,
+            type: EVENT,
             data: args,
         })
     }
@@ -65,7 +66,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
         args.unshift(event)
 
         const packet: TeckosPacket = {
-            type: TeckosPacketType.EVENT,
+            type: EVENT,
             data: args,
         }
 
@@ -88,7 +89,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
             if (sent) return
 
             this._send({
-                type: TeckosPacketType.ACK,
+                type: ACK,
                 data: args,
                 id,
             })
@@ -103,7 +104,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
 
             if (this._debug) d(`Got packet from ${this._id}: ${JSON.stringify(packet.data)}`)
 
-            if (packet.type === TeckosPacketType.EVENT) {
+            if (packet.type === EVENT) {
                 const event = packet.data[0] as string
                 if (this._handlers[event]) {
                     const args = packet.data.slice(1)
@@ -119,7 +120,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
                         error(eventError)
                     }
                 }
-            } else if (packet.type === TeckosPacketType.ACK && packet.id !== undefined) {
+            } else if (packet.type === ACK && packet.id !== undefined) {
                 // Call assigned function
                 const ack = this._acks.get(packet.id)
                 if (typeof ack === 'function') {

@@ -106,6 +106,6 @@ dist
 .tern-port
 
 /lib
-/uws
 /.idea
 binaries.zip
+bin

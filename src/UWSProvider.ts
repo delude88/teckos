@@ -1,13 +1,13 @@
-import IORedis from 'ioredis'
+import * as IORedis from 'ioredis'
 import * as crypto from 'crypto'
-import debug from 'debug'
-import * as uWs from 'uwebsocketjs'
+import * as debug from 'debug'
+import { TemplatedApp, SHARED_COMPRESSOR, WebSocket } from './uws'
 import { UWSSocket } from './UWSSocket'
 import { encodePacket } from './util/Converter'
-import { TeckosPacketType } from './types/TeckosPacket'
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler'
 import { ITeckosProvider } from './types/ITeckosProvider'
 import { TeckosOptions } from './types/TeckosOptions'
+import { EVENT } from './types/TeckosPacketType'
 
 const d = debug('teckos:provider')
 const verbose = d.extend('trace')
@@ -23,7 +23,7 @@ function generateUUID(): string {
 }
 
 class UWSProvider implements ITeckosProvider {
-    private _app: uWs.TemplatedApp
+    private _app: TemplatedApp
 
     private readonly _options: TeckosOptions
 
@@ -37,7 +37,7 @@ class UWSProvider implements ITeckosProvider {
 
     private _handlers: ITeckosSocketHandler[] = []
 
-    constructor(app: uWs.TemplatedApp, options?: TeckosOptions) {
+    constructor(app: TemplatedApp, options?: TeckosOptions) {
         this._app = app
         this._options = {
             redisUrl: options?.redisUrl || undefined,
@@ -78,12 +78,12 @@ class UWSProvider implements ITeckosProvider {
         }
         this._app.ws('/*', {
             /* Options */
-            compression: uWs.SHARED_COMPRESSOR,
+            compression: SHARED_COMPRESSOR,
             maxPayloadLength: 16 * 1024 * 1024,
             idleTimeout: 0,
             maxBackpressure: 1024,
 
-            open: (ws: uWs.WebSocket) => {
+            open: (ws: WebSocket) => {
                 const id: string = generateUUID()
                 /* Let this client listen to all sensor topics */
 
@@ -107,7 +107,7 @@ class UWSProvider implements ITeckosProvider {
                 // eslint-disable-next-line no-param-reassign
                 ws.alive = true
             },
-            message: (ws: uWs.WebSocket, buffer: ArrayBuffer) => {
+            message: (ws: WebSocket, buffer: ArrayBuffer) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (this._connections[id]) {
@@ -116,12 +116,12 @@ class UWSProvider implements ITeckosProvider {
                     error(`Got message from unknown connection: ${id}`)
                 }
             },
-            drain: (ws: uWs.WebSocket) => {
+            drain: (ws: WebSocket) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (options?.debug) verbose(`Drain: ${id}`)
             },
-            close: (ws: uWs.WebSocket) => {
+            close: (ws: WebSocket) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (this._connections[id]) {
@@ -142,9 +142,10 @@ class UWSProvider implements ITeckosProvider {
         setTimeout(
             (connections: { [uuid: string]: UWSSocket }) => {
                 Object.keys(connections).forEach((uuid) => {
-                    if (this._connections[uuid].ws.alive) {
-                        this._connections[uuid].ws.alive = false
-                        this._connections[uuid].ws.ping('hey')
+                    const ws = this._connections[uuid].ws()
+                    if (ws.alive) {
+                        ws.alive = false
+                        ws.ping('hey')
                     } else {
                         // Terminate connection
                         if (this._options.debug)
@@ -167,7 +168,7 @@ class UWSProvider implements ITeckosProvider {
     toAll = (event: string, ...args: any[]): this => {
         args.unshift(event)
         const buffer = encodePacket({
-            type: TeckosPacketType.EVENT,
+            type: EVENT,
             data: args,
         })
         if (this._pub) {
@@ -182,7 +183,7 @@ class UWSProvider implements ITeckosProvider {
     to = (group: string, event: string, ...args: any[]): this => {
         args.unshift(event)
         const buffer = encodePacket({
-            type: TeckosPacketType.EVENT,
+            type: EVENT,
             data: args,
         })
         if (this._pub) {

@@ -1,7 +1,7 @@
 const sharedPresets = ['@babel/typescript'];
 const shared = {
     ignore: ['src/**/*.spec.ts'],
-    presets: sharedPresets
+    presets: sharedPresets,
 }
 
 module.exports = {
@@ -10,17 +10,19 @@ module.exports = {
         esmBundled: {
             ...shared,
             presets: [['@babel/env', {
-                targets: "> 0.25%, not dead"
+                targets: {
+                    "node": "current"
+                }
             }], ...sharedPresets],
         },
         cjs: {
             ...shared,
             presets: [['@babel/env', {
-                modules: 'commonjs'
+                modules: 'commonjs',
+                targets: {
+                    "node": "current"
+                }
             }], ...sharedPresets],
-        },
-        test: {
-            presets: ['@babel/env', ...sharedPresets]
-        },
+        }
     }
 }

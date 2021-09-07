@@ -5,10 +5,6 @@ import { TeckosSocketEvent } from './types/TeckosSocketEvent'
 import { TeckosPacket } from './types/TeckosPacket'
 import { ITeckosSocket } from './types/ITeckosSocket'
 import { ACK, EVENT } from './types/TeckosPacketType'
-import * as debug from 'debug'
-
-const d = debug('teckos:socket')
-const error = d.extend('error')
 
 class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckosSocket {
     protected readonly _id: string
@@ -43,13 +39,13 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     }
 
     join = (group: string): this => {
-        if (this._debug) d(`${this._id} joining group ${group}`)
+        if (this._debug) console.log(`${this._id} joining group ${group}`)
         this._ws.subscribe(group)
         return this
     }
 
     leave = (group: string): this => {
-        if (this._debug) d(`${this._id} left group ${group}`)
+        if (this._debug) console.log(`${this._id} left group ${group}`)
         this._ws.unsubscribe(group)
         return this
     }
@@ -79,7 +75,8 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     }
 
     private _send = (packet: TeckosPacket): boolean => {
-        if (this._debug) d(`Sending packet to ${this._id}:  ${JSON.stringify(packet.data)}`)
+        if (this._debug)
+            console.log(`Sending packet to ${this._id}:  ${JSON.stringify(packet.data)}`)
         return this._ws.send(encodePacket(packet))
     }
 
@@ -102,7 +99,8 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
         try {
             const packet = decodePacket(buffer)
 
-            if (this._debug) d(`Got packet from ${this._id}: ${JSON.stringify(packet.data)}`)
+            if (this._debug)
+                console.log(`Got packet from ${this._id}: ${JSON.stringify(packet.data)}`)
 
             if (packet.type === EVENT) {
                 const event = packet.data[0] as string
@@ -117,7 +115,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
                     try {
                         this._handlers[event].forEach((handler) => handler(...args))
                     } catch (eventError) {
-                        error(eventError)
+                        console.error(eventError)
                     }
                 }
             } else if (packet.type === ACK && packet.id !== undefined) {
@@ -128,15 +126,15 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
                     this._acks.delete(packet.id)
                 }
             } else {
-                error(`Unknown packet: ${packet.type}`)
+                console.error(`Unknown packet: ${packet.type}`)
             }
         } catch (messageError) {
-            error(messageError)
+            console.error(messageError)
         }
     }
 
     onDisconnect = (): void => {
-        if (this._debug) d(`Client ${this._id} disconnected`)
+        if (this._debug) console.log(`Client ${this._id} disconnected`)
         if (this._handlers.disconnect) {
             this._handlers.disconnect.forEach((handler) => handler())
         }
@@ -145,7 +143,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     error = (message?: string): boolean => this.emit('error', message)
 
     disconnect = (): this => {
-        if (this._debug) d(`Disconnecting ${this._id}`)
+        if (this._debug) console.log(`Disconnecting ${this._id}`)
         this._ws.close()
         return this
     }

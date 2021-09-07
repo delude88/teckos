@@ -1,6 +1,5 @@
 import * as IORedis from 'ioredis'
 import * as crypto from 'crypto'
-import * as debug from 'debug'
 import { TemplatedApp, SHARED_COMPRESSOR, WebSocket } from './uws'
 import { UWSSocket } from './UWSSocket'
 import { encodePacket } from './util/Converter'
@@ -8,10 +7,6 @@ import { ITeckosSocketHandler } from './types/ITeckosSocketHandler'
 import { ITeckosProvider } from './types/ITeckosProvider'
 import { TeckosOptions } from './types/TeckosOptions'
 import { EVENT } from './types/TeckosPacketType'
-
-const d = debug('teckos:provider')
-const verbose = d.extend('trace')
-const error = d.extend('error')
 
 const DEFAULT_OPTION: TeckosOptions = {
     pingInterval: 25000,
@@ -48,13 +43,13 @@ class UWSProvider implements ITeckosProvider {
 
         const { redisUrl } = this._options
         if (redisUrl) {
-            d(`Using REDIS at ${redisUrl}`)
+            console.log(`Using REDIS at ${redisUrl}`)
             this._pub = new IORedis(redisUrl)
             this._sub = new IORedis(redisUrl)
 
             this._sub.subscribe('a', (err) => {
                 if (err) {
-                    error(err.message)
+                    console.error(err.message)
                 }
             })
             // Since we are only subscribing to a,
@@ -65,14 +60,15 @@ class UWSProvider implements ITeckosProvider {
 
             this._sub.psubscribe('g.*', (err) => {
                 if (err) {
-                    error(err.message)
+                    console.error(err.message)
                 }
             })
             // Since we are only p-subscribing to g.*,
             // no further checks are necessary (trusting ioredis here)
             this._sub.on('pmessage', (_channel, pattern: string, message: Buffer | string) => {
                 const group = pattern.substr(2)
-                if (this._options.debug) verbose(`Publishing message from REDIS to group ${group}`)
+                if (this._options.debug)
+                    console.log(`Publishing message from REDIS to group ${group}`)
                 this._app.publish(group, message)
             })
         }
@@ -100,7 +96,7 @@ class UWSProvider implements ITeckosProvider {
                         handler(this._connections[id])
                     })
                 } catch (handlerError) {
-                    error(handlerError)
+                    console.error(handlerError)
                 }
             },
             pong: (ws) => {
@@ -113,20 +109,20 @@ class UWSProvider implements ITeckosProvider {
                 if (this._connections[id]) {
                     this._connections[id].onMessage(buffer)
                 } else {
-                    error(`Got message from unknown connection: ${id}`)
+                    console.error(`Got message from unknown connection: ${id}`)
                 }
             },
             drain: (ws: WebSocket) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
-                if (options?.debug) verbose(`Drain: ${id}`)
+                if (options?.debug) console.log(`Drain: ${id}`)
             },
             close: (ws: WebSocket) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (this._connections[id]) {
                     if (this._options.debug) {
-                        verbose(`Client ${id} disconnected, removing from registry`)
+                        console.log(`Client ${id} disconnected, removing from registry`)
                     }
                     this._connections[id].onDisconnect()
                     delete this._connections[id]
@@ -149,7 +145,7 @@ class UWSProvider implements ITeckosProvider {
                     } else {
                         // Terminate connection
                         if (this._options.debug)
-                            verbose(`Ping pong timeout for ${uuid}, disconnecting client...`)
+                            console.log(`Ping pong timeout for ${uuid}, disconnecting client...`)
                         this._connections[uuid].disconnect()
                     }
                 })
@@ -172,9 +168,9 @@ class UWSProvider implements ITeckosProvider {
             data: args,
         })
         if (this._pub) {
-            this._pub.publishBuffer('a', buffer).catch((err) => error(err))
+            this._pub.publishBuffer('a', buffer).catch((err) => console.error(err))
         } else {
-            if (this._options.debug) verbose(`Publishing event ${event} to group a`)
+            if (this._options.debug) console.log(`Publishing event ${event} to group a`)
             this._app.publish('a', buffer)
         }
         return this
@@ -187,9 +183,9 @@ class UWSProvider implements ITeckosProvider {
             data: args,
         })
         if (this._pub) {
-            this._pub.publishBuffer(`g.${group}`, buffer).catch((err) => error(err))
+            this._pub.publishBuffer(`g.${group}`, buffer).catch((err) => console.error(err))
         } else {
-            if (this._options.debug) verbose(`Publishing event ${event} to group ${group}`)
+            if (this._options.debug) console.log(`Publishing event ${event} to group ${group}`)
             this._app.publish(group, buffer)
         }
         return this

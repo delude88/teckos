@@ -1,6 +1,6 @@
 {
   "name": "teckos",
-  "version": "0.3.9999",
+  "version": "0.4.0",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "./lib/index.js",
   "sideEffects": false,
@@ -27,7 +27,7 @@
     "es-check": "es-check es2020 --module lib/index.js",
     "build": "rimraf lib && node esbuild.config.cjs && npm run ts-types && npm run es-check",
     "lint": "npx eslint ./src --ext .js,.ts",
-    "preversion": "npm run lint && npm run build && es-check es5 ./lib/index.js",
+    "preversion": "npm run lint && npm run build && npm run es-check",
     "version": "git add -A src",
     "postversion": "git push && git push --tags"
   },

@@ -1,4 +1,4 @@
-import { WebSocket } from 'uWebSockets.js'
+import { WebSocket } from './uws'
 import { SocketEventEmitter } from './SocketEventEmitter'
 import { decodePacket, encodePacket } from './util/Converter'
 import { TeckosSocketEvent } from './types/TeckosSocketEvent'

@@ -28,20 +28,22 @@ const buildBinaries = async () => {
                 console.error(error);
             })
     }
-    if(!fs.existsSync("./uws/uws_darwin_arm64_93.node")) {
+    if(!fs.existsSync("./bin")) {
         try {
             const zip = new AdmZip("./binaries.zip");
             zip.extractAllTo(".", true);
+            fs.mkdirSync("./bin")
             fs.readdirSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
                 .forEach(file => {
                     if(file.endsWith(".node")) {
-                        fs.copyFileSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./uws/" + file)
+                        fs.copyFileSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./bin/" + file)
                     }
                 })
             rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
         } catch(err ) {
             console.error(err)
             rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
+            rimraf.sync("./bin")
         }
     }
 };

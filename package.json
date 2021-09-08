@@ -24,7 +24,7 @@
   "scripts": {
     "clean": "rimraf lib",
     "postinstall": "node npm-scripts.js",
-    "ts-types": " tsc --emitDeclarationOnly --outDir lib",
+    "ts-types": "tsc -p tsconfig.json",
     "es-check": "es-check es2020 --module lib/index.js",
     "build": "rimraf lib && node esbuild.config.cjs && npm run ts-types && npm run es-check",
     "lint": "npx eslint ./src --ext .js,.ts",
@@ -86,8 +86,5 @@
     "dotenv": "^10.0.0",
     "ioredis": "^4.27.9",
     "rimraf": "^3.0.2"
-  },
-  "optionalDependencies": {
-    "uWebSockets.js": "file:./uws"
   }
 }

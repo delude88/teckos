@@ -16,10 +16,11 @@
   },
   "exclude": [
     "node_modules",
-    "lib"
+    "lib",
+    "uws"
   ],
   "include": [
-    "./src/**/*.ts",
-    "./src/**/*.d.ts",
+    "./src/**/*.cjs",
+    "./src/**/*.ts"
   ],
 }

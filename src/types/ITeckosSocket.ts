@@ -1,6 +1,6 @@
 import * as events from 'events'
 import { TeckosSocketEvent } from './TeckosSocketEvent'
-import { WebSocket } from '../uws'
+import { WebSocket } from 'uWebSockets.js'
 
 export interface ITeckosSocket extends events.EventEmitter {
     id(): string

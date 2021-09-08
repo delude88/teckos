@@ -19,8 +19,7 @@
     "lib"
   ],
   "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.d.ts"
+    "./src/**/*.ts",
+    "./src/**/*.d.ts",
   ],
 }

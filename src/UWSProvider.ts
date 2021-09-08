@@ -1,6 +1,6 @@
 import IORedis from 'ioredis'
 import * as crypto from 'crypto'
-import uws, { TemplatedApp, WebSocket } from 'uwebsocketsjs'
+import uws, { TemplatedApp, WebSocket } from 'uWebSockets.js'
 import { UWSSocket } from './UWSSocket'
 import { encodePacket } from './util/Converter'
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler'

@@ -85,6 +85,6 @@
     "dotenv": "^10.0.0",
     "ioredis": "^4.27.9",
     "rimraf": "^3.0.2",
-    "uwebsocketsjs": "file:./uwebsocketsjs"
+    "uWebSockets.js": "file:./uws"
   }
 }

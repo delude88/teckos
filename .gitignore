@@ -108,4 +108,5 @@ dist
 /lib
 /.idea
 binaries.zip
-bin
+/bin
+/uws/*.node

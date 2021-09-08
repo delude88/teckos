@@ -1,6 +1,6 @@
-import * as IORedis from 'ioredis'
+import IORedis from 'ioredis'
 import * as crypto from 'crypto'
-import { TemplatedApp, SHARED_COMPRESSOR, WebSocket } from './uws'
+import uws, { TemplatedApp, WebSocket } from 'uwebsocketsjs'
 import { UWSSocket } from './UWSSocket'
 import { encodePacket } from './util/Converter'
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler'
@@ -74,7 +74,7 @@ class UWSProvider implements ITeckosProvider {
         }
         this._app.ws('/*', {
             /* Options */
-            compression: SHARED_COMPRESSOR,
+            compression: uws.SHARED_COMPRESSOR,
             maxPayloadLength: 16 * 1024 * 1024,
             idleTimeout: 0,
             maxBackpressure: 1024,

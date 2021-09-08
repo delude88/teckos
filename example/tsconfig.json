@@ -4,6 +4,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "module": "esnext",
+    "target": "esnext",
     "importHelpers": true,
     // output .d.ts declaration files for consumers
     "declaration": true,

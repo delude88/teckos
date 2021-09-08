@@ -1,8 +1,7 @@
-const fs = require("fs")
-const Axios = require("axios")
-const AdmZip = require("adm-zip")
-const rimraf = require("rimraf");
-
+import fs from "fs";
+import rimraf from "rimraf";
+import AdmZip from "adm-zip";
+import Axios from "axios";
 
 const U_WEBSOCKET_VERSION = "19.3.0";
 
@@ -29,17 +28,22 @@ const buildBinaries = async () => {
                 console.error(error);
             })
     }
-    if(!fs.existsSync("./bin")) {
-        const zip = new AdmZip("./binaries.zip");
-        zip.extractAllTo(".", true);
-        fs.mkdirSync("bin")
-        fs.readdirSync("uWebSockets.js-" + U_WEBSOCKET_VERSION)
-            .forEach(file => {
-                if(file.endsWith("LICENSE") || file.endsWith(".node")) {
-                    fs.copyFileSync("uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./bin/" + file)
-                }
-            })
-        rimraf.sync("uWebSockets.js-" + U_WEBSOCKET_VERSION)
+    if(!fs.existsSync("./uwebsocketjs")) {
+        try {
+            const zip = new AdmZip("./binaries.zip");
+            zip.extractAllTo("uwebsocketjs", true);
+            fs.mkdirSync("bin")
+            fs.readdirSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
+                .forEach(file => {
+                    if(file.endsWith("LICENSE") || file.endsWith(".node")) {
+                        fs.copyFileSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./bin/" + file)
+                    }
+                })
+            rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
+        } catch(err ) {
+            console.error(err)
+            rimraf.sync("./bin")
+        }
     }
 };
 

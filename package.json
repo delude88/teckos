@@ -1,6 +1,6 @@
 {
   "name": "teckos",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "./lib/index.js",
   "sideEffects": false,
@@ -15,7 +15,8 @@
   "files": [
     "src",
     "lib",
-    "npm-scripts.js"
+    "npm-scripts.js",
+    "uws"
   ],
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"

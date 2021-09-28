@@ -1,7 +1,10 @@
 import { ITeckosProvider } from './types/ITeckosProvider'
 import { ITeckosSocket } from './types/ITeckosSocket'
-import { TeckosPacketType, TeckosPacket } from './types/TeckosPacket'
+import { TeckosPacket } from './types/TeckosPacket'
+import uws from '../uws'
 import { UWSProvider } from './UWSProvider'
 import { UWSSocket } from './UWSSocket'
 
-export { UWSSocket, TeckosPacket, TeckosPacketType, ITeckosSocket, ITeckosProvider, UWSProvider }
+export * from '../uws'
+export type { TeckosPacket, ITeckosSocket, ITeckosProvider }
+export { UWSSocket, UWSProvider, uws }

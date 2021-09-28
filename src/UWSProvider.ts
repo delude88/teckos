@@ -1,17 +1,13 @@
+/* eslint-disable no-console */
 import IORedis from 'ioredis'
 import * as crypto from 'crypto'
-import debug from 'debug'
-import * as uWs from './../uws'
+import uws, { TemplatedApp, WebSocket } from '../uws'
 import { UWSSocket } from './UWSSocket'
 import { encodePacket } from './util/Converter'
-import { TeckosPacketType } from './types/TeckosPacket'
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler'
 import { ITeckosProvider } from './types/ITeckosProvider'
 import { TeckosOptions } from './types/TeckosOptions'
-
-const d = debug('teckos:provider')
-const verbose = d.extend('trace')
-const error = d.extend('error')
+import { EVENT } from './types/TeckosPacketType'
 
 const DEFAULT_OPTION: TeckosOptions = {
     pingInterval: 25000,
@@ -23,7 +19,7 @@ function generateUUID(): string {
 }
 
 class UWSProvider implements ITeckosProvider {
-    private _app: uWs.TemplatedApp
+    private _app: TemplatedApp
 
     private readonly _options: TeckosOptions
 
@@ -37,7 +33,7 @@ class UWSProvider implements ITeckosProvider {
 
     private _handlers: ITeckosSocketHandler[] = []
 
-    constructor(app: uWs.TemplatedApp, options?: TeckosOptions) {
+    constructor(app: TemplatedApp, options?: TeckosOptions) {
         this._app = app
         this._options = {
             redisUrl: options?.redisUrl || undefined,
@@ -48,13 +44,13 @@ class UWSProvider implements ITeckosProvider {
 
         const { redisUrl } = this._options
         if (redisUrl) {
-            d(`Using REDIS at ${redisUrl}`)
+            if (this._options.debug) console.log(`Using REDIS at ${redisUrl}`)
             this._pub = new IORedis(redisUrl)
             this._sub = new IORedis(redisUrl)
 
             this._sub.subscribe('a', (err) => {
                 if (err) {
-                    error(err.message)
+                    console.error(err.message)
                 }
             })
             // Since we are only subscribing to a,
@@ -65,25 +61,27 @@ class UWSProvider implements ITeckosProvider {
 
             this._sub.psubscribe('g.*', (err) => {
                 if (err) {
-                    error(err.message)
+                    console.error(err.message)
                 }
             })
             // Since we are only p-subscribing to g.*,
             // no further checks are necessary (trusting ioredis here)
             this._sub.on('pmessage', (_channel, pattern: string, message: Buffer | string) => {
                 const group = pattern.substr(2)
-                if (this._options.debug) verbose(`Publishing message from REDIS to group ${group}`)
+                if (this._options.debug)
+                    console.log(`Publishing message from REDIS to group ${group}`)
                 this._app.publish(group, message)
             })
         }
         this._app.ws('/*', {
             /* Options */
-            compression: uWs.SHARED_COMPRESSOR,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+            compression: uws.SHARED_COMPRESSOR,
             maxPayloadLength: 16 * 1024 * 1024,
             idleTimeout: 0,
             maxBackpressure: 1024,
 
-            open: (ws: uWs.WebSocket) => {
+            open: (ws: WebSocket) => {
                 const id: string = generateUUID()
                 /* Let this client listen to all sensor topics */
 
@@ -100,33 +98,33 @@ class UWSProvider implements ITeckosProvider {
                         handler(this._connections[id])
                     })
                 } catch (handlerError) {
-                    error(handlerError)
+                    console.error(handlerError)
                 }
             },
             pong: (ws) => {
                 // eslint-disable-next-line no-param-reassign
                 ws.alive = true
             },
-            message: (ws: uWs.WebSocket, buffer: ArrayBuffer) => {
+            message: (ws: WebSocket, buffer: ArrayBuffer) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (this._connections[id]) {
                     this._connections[id].onMessage(buffer)
                 } else {
-                    error(`Got message from unknown connection: ${id}`)
+                    console.error(`Got message from unknown connection: ${id}`)
                 }
             },
-            drain: (ws: uWs.WebSocket) => {
+            drain: (ws: WebSocket) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
-                if (options?.debug) verbose(`Drain: ${id}`)
+                if (options?.debug) console.log(`Drain: ${id}`)
             },
-            close: (ws: uWs.WebSocket) => {
+            close: (ws: WebSocket) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (this._connections[id]) {
                     if (this._options.debug) {
-                        verbose(`Client ${id} disconnected, removing from registry`)
+                        console.log(`Client ${id} disconnected, removing from registry`)
                     }
                     this._connections[id].onDisconnect()
                     delete this._connections[id]
@@ -142,13 +140,14 @@ class UWSProvider implements ITeckosProvider {
         setTimeout(
             (connections: { [uuid: string]: UWSSocket }) => {
                 Object.keys(connections).forEach((uuid) => {
-                    if (this._connections[uuid].ws.alive) {
-                        this._connections[uuid].ws.alive = false
-                        this._connections[uuid].ws.ping('hey')
+                    const ws = this._connections[uuid].ws()
+                    if (ws.alive) {
+                        ws.alive = false
+                        ws.ping('hey')
                     } else {
                         // Terminate connection
                         if (this._options.debug)
-                            verbose(`Ping pong timeout for ${uuid}, disconnecting client...`)
+                            console.log(`Ping pong timeout for ${uuid}, disconnecting client...`)
                         this._connections[uuid].disconnect()
                     }
                 })
@@ -167,13 +166,13 @@ class UWSProvider implements ITeckosProvider {
     toAll = (event: string, ...args: any[]): this => {
         args.unshift(event)
         const buffer = encodePacket({
-            type: TeckosPacketType.EVENT,
+            type: EVENT,
             data: args,
         })
         if (this._pub) {
-            this._pub.publishBuffer('a', buffer).catch((err) => error(err))
+            this._pub.publishBuffer('a', buffer).catch((err) => console.error(err))
         } else {
-            if (this._options.debug) verbose(`Publishing event ${event} to group a`)
+            if (this._options.debug) console.log(`Publishing event ${event} to group a`)
             this._app.publish('a', buffer)
         }
         return this
@@ -182,13 +181,13 @@ class UWSProvider implements ITeckosProvider {
     to = (group: string, event: string, ...args: any[]): this => {
         args.unshift(event)
         const buffer = encodePacket({
-            type: TeckosPacketType.EVENT,
+            type: EVENT,
             data: args,
         })
         if (this._pub) {
-            this._pub.publishBuffer(`g.${group}`, buffer).catch((err) => error(err))
+            this._pub.publishBuffer(`g.${group}`, buffer).catch((err) => console.error(err))
         } else {
-            if (this._options.debug) verbose(`Publishing event ${event} to group ${group}`)
+            if (this._options.debug) console.log(`Publishing event ${event} to group ${group}`)
             this._app.publish(group, buffer)
         }
         return this

@@ -1,10 +1,7 @@
-export enum TeckosPacketType {
-    EVENT,
-    ACK,
-}
-
-export interface TeckosPacket {
-    type: TeckosPacketType
+interface TeckosPacket {
+    type: number
     data: any[]
     id?: number
 }
+
+export type { TeckosPacket }

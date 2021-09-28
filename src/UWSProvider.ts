@@ -140,7 +140,7 @@ class UWSProvider implements ITeckosProvider {
         setTimeout(
             (connections: { [uuid: string]: UWSSocket }) => {
                 Object.keys(connections).forEach((uuid) => {
-                    const ws = this._connections[uuid].ws()
+                    const { ws } = this._connections[uuid]
                     if (ws.alive) {
                         ws.alive = false
                         ws.ping('hey')

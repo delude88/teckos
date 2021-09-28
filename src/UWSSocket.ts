@@ -24,11 +24,11 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
         [event: string]: ((...args: any[]) => void)[]
     } = {}
 
-    id = (): string => {
+    get id(): string {
         return this._id
     }
 
-    ws = (): WebSocket => {
+    get ws(): WebSocket {
         return this._ws
     }
 

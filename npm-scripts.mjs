@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs, {readdirSync} from "fs";
 import rimraf from "rimraf";
 import AdmZip from "adm-zip";
 import Axios from "axios";
@@ -28,11 +28,19 @@ const buildBinaries = async () => {
                 console.error(error)
             })
     }
-    if (!fs.existsSync("./uws")) {
+    const hasNoBinaries = !fs.existsSync("./uws") || fs.readdirSync('./uws').find(file => file.endsWith(".node"))
+    if (hasNoBinaries) {
         try {
             const zip = new AdmZip("./binaries.zip")
             zip.extractAllTo(".", true)
-            fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION, "./uws")
+            if (!fs.existsSync("./uws")) {
+                fs.mkdirSync("./uws")
+            }
+            fs.readdirSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
+                .map(file => {
+                    fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./uws/" + file)
+                })
+            rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
         } catch (err) {
             console.error(err)
             rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)

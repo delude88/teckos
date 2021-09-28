@@ -12,8 +12,8 @@ declare class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements
     _handlers: {
         [event: string]: ((...args: any[]) => void)[];
     };
-    id: () => string;
-    ws: () => WebSocket;
+    get id(): string;
+    get ws(): WebSocket;
     constructor(id: string, ws: WebSocket, verbose?: boolean);
     join: (group: string) => this;
     leave: (group: string) => this;

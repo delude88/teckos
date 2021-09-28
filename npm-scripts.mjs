@@ -28,22 +28,15 @@ const buildBinaries = async () => {
                 console.error(error);
             })
     }
-    if(!fs.existsSync("./bin")) {
+    if(!fs.existsSync("./uws")) {
         try {
             const zip = new AdmZip("./binaries.zip");
             zip.extractAllTo(".", true);
-            fs.mkdirSync("./bin")
-            fs.readdirSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
-                .forEach(file => {
-                    if(file.endsWith(".node")) {
-                        fs.copyFileSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./bin/" + file)
-                    }
-                })
-            rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
+            fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION, "./uws")
         } catch(err ) {
             console.error(err)
             rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
-            rimraf.sync("./bin")
+            rimraf.sync("./uws")
         }
     }
 };

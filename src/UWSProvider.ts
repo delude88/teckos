@@ -1,6 +1,6 @@
 import IORedis from 'ioredis'
 import * as crypto from 'crypto'
-import uws, { TemplatedApp, WebSocket } from './uws'
+import { uws, TemplatedApp, WebSocket } from './uws'
 import { UWSSocket } from './UWSSocket'
 import { encodePacket } from './util/Converter'
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler'
@@ -74,6 +74,7 @@ class UWSProvider implements ITeckosProvider {
         }
         this._app.ws('/*', {
             /* Options */
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
             compression: uws.SHARED_COMPRESSOR,
             maxPayloadLength: 16 * 1024 * 1024,
             idleTimeout: 0,

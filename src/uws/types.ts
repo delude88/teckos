@@ -14,6 +14,13 @@
 /** WebSocket compression options */
 export type CompressOptions = number
 
+export interface MultipartField {
+    data: ArrayBuffer
+    name: string
+    type?: string
+    filename?: string
+}
+
 /** Native type representing a raw uSockets struct us_listen_socket_t.
  * Careful with this one, it is entirely unchecked and native so invalid usage will blow up.
  */

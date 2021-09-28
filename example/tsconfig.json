@@ -3,7 +3,7 @@
   "include": ["src"],
   "compilerOptions": {
     "outDir": "dist",
-    "module": "esnext",
+    "module": "commonjs",
     "target": "esnext",
     "importHelpers": true,
     // output .d.ts declaration files for consumers

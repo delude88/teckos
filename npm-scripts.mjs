@@ -24,22 +24,15 @@ const buildBinaries = async () => {
         console.log("Downloading binaries...")
         await download("https://github.com/uNetworking/uWebSockets.js/archive/refs/tags/v" + U_WEBSOCKET_VERSION + ".zip", "binaries.zip")
             .catch((error) => {
-                fs.rmSync("./binaries.zip");
-                console.error(error);
+                fs.rmSync("./binaries.zip")
+                console.error(error)
             })
     }
-    if (!fs.existsSync("./bin")) {
+    if (!fs.existsSync("./uws")) {
         try {
-            const zip = new AdmZip("./binaries.zip");
-            zip.extractAllTo(".", true);
-            fs.mkdirSync("./bin")
-            fs.readdirSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
-                .forEach(file => {
-                    if (file.endsWith("LICENSE") || file.endsWith(".node")) {
-                        fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./bin/" + file)
-                    }
-                })
-            fs.rmSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION, {recursive: true, force: true})
+            const zip = new AdmZip("./binaries.zip")
+            zip.extractAllTo(".", true)
+            fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION, "./uws")
         } catch (err) {
             console.error(err)
             rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)

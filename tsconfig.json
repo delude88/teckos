@@ -3,7 +3,7 @@
     "allowJs": true,
     "declaration": true,
     "target": "esnext",
-    "module": "esnext",
+    "module": "commonjs",
     "lib": ["esnext", "dom"],
     "strict": true,
     "noImplicitAny": false,
@@ -12,12 +12,10 @@
     "emitDeclarationOnly": true,
     "declarationMap": true,
     "isolatedModules": true,
-    "outDir": "lib"
+    "outDir": "types"
   },
   "include": [
-    "./src/**/*.cjs",
     "./src/**/*.ts",
-    "./src/**/*.js"
   ],
   "exclude": [
     "node_modules",

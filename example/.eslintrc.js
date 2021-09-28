@@ -1,5 +1,8 @@
 module.exports = {
-    extends: ['airbnb-typescript/base'],
+    extends: [
+        'airbnb-base',
+        'airbnb-typescript/base'
+    ],
     rules: {
         "no-console": 0,
         "linebreak-style": 0

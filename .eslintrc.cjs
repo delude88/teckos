@@ -1,6 +1,7 @@
 module.exports = {
     plugins: ["import"],
     extends: [
+        'airbnb-base',
         'airbnb-typescript/base',
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
@@ -41,7 +42,8 @@ module.exports = {
             {
                 "endOfLine": "auto"
             },
-        ]
+        ],
+        "no-underscore-dangle": "off"
     },
     parserOptions: {
         project: './tsconfig.json'

@@ -42,10 +42,10 @@ describe('Example connection using JWT', () => {
 
     it('Client can connect', (done) => {
         client.on("connect", () => {
-            client.disconnect()
             done()
         })
         client.connect()
+        client.disconnect()
     })
 
 

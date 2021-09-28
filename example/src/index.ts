@@ -1,12 +1,12 @@
 import { config } from 'dotenv';
-import {UWSProvider, App} from 'teckos';
+import {UWSProvider, uws} from 'teckos';
 
 config();
 
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 
 const start = async () => {
-  const app = App()
+  const app = uws.App()
   const io = new UWSProvider(app, {
     redisUrl: process.env.REDIS_URL,
     pingInterval: 2000,

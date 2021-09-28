@@ -1,6 +1,6 @@
 {
   "name": "teckos",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "sideEffects": false,
   "type": "commonjs",
@@ -8,6 +8,7 @@
   "module": "./dist/index.esm.js",
   "types": "./types/index.d.ts",
   "files": [
+    "types",
     "src",
     "lib",
     "npm-scripts.mjs"

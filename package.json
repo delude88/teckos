@@ -1,6 +1,6 @@
 {
   "name": "teckos",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "sideEffects": false,
   "type": "commonjs",

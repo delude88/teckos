@@ -21,8 +21,8 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
             throw new Error('Max listeners reached')
         }
         this._handlers[event] = this._handlers[event] || []
-        const onceWrapper = () => {
-            listener()
+        const onceWrapper = (...args: any[]) => {
+            listener(...args)
             this.off(event, onceWrapper)
         }
         this._handlers[event].push(onceWrapper)
@@ -85,8 +85,8 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
             throw new Error('Max listeners reached')
         }
         this._handlers[event] = this._handlers[event] || []
-        const onceWrapper = () => {
-            listener()
+        const onceWrapper = (...args: any[]) => {
+            listener(...args)
             this.off(event, onceWrapper)
         }
         this._handlers[event].unshift(onceWrapper)

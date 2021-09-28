@@ -4,7 +4,8 @@ import { TeckosPacket } from './types/TeckosPacket'
 import uws from '../uws'
 import { UWSProvider } from './UWSProvider'
 import { UWSSocket } from './UWSSocket'
+import { UWSProviderWithToken } from './UWSProviderWithToken'
 
 export * from '../uws'
 export type { TeckosPacket, ITeckosSocket, ITeckosProvider }
-export { UWSSocket, UWSProvider, uws }
+export { UWSSocket, UWSProvider, UWSProviderWithToken, uws }

@@ -14,13 +14,14 @@
     "isolatedModules": true,
     "outDir": "lib"
   },
+  "include": [
+    "./src/**/*.cjs",
+    "./src/**/*.ts",
+    "./src/**/*.js"
+  ],
   "exclude": [
     "node_modules",
     "lib",
-    "uws"
-  ],
-  "include": [
-    "./src/**/*.cjs",
-    "./src/**/*.ts"
-  ],
+    "uws",
+  ]
 }

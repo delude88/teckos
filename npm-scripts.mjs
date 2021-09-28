@@ -28,12 +28,19 @@ const buildBinaries = async () => {
                 console.error(error);
             })
     }
-    if(!fs.existsSync("./uws")) {
+    if (!fs.existsSync("./bin")) {
         try {
             const zip = new AdmZip("./binaries.zip");
             zip.extractAllTo(".", true);
-            fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION, "./uws")
-        } catch(err ) {
+            fs.mkdirSync("./bin")
+            fs.readdirSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
+                .forEach(file => {
+                    if (file.endsWith("LICENSE") || file.endsWith(".node")) {
+                        fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./bin/" + file)
+                    }
+                })
+            fs.rmSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION, {recursive: true, force: true})
+        } catch (err) {
             console.error(err)
             rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
             rimraf.sync("./uws")

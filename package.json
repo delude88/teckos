@@ -1,6 +1,6 @@
 {
   "name": "teckos",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "./lib/index.cjs",
   "module": "./lib/index.mjs",
@@ -8,6 +8,10 @@
     ".": {
       "import": "./lib/index.mjs",
       "require": "./lib/index.cjs"
+    },
+    "./uws": {
+      "import": "./uws/index.mjs",
+      "require": "./uws/index.cjs"
     }
   },
   "types": "./types/index.d.ts",

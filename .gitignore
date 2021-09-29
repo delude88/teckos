@@ -107,6 +107,6 @@ dist
 
 /lib
 /.idea
-binaries.zip
+binaries*.zip
 /bin
 /uws/*.node

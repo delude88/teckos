@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { UWSProvider, uws } from 'teckos';
+import {uws, UWSProvider} from 'teckos';
 
 config();
 

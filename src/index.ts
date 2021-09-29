@@ -6,6 +6,5 @@ import { UWSProvider } from './UWSProvider'
 import { UWSSocket } from './UWSSocket'
 import { UWSProviderWithToken } from './UWSProviderWithToken'
 
-export * from '../uws'
 export type { TeckosPacket, ITeckosSocket, ITeckosProvider }
 export { UWSSocket, UWSProvider, UWSProviderWithToken, uws }

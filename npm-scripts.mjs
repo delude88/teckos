@@ -3,7 +3,7 @@ import rimraf from "rimraf";
 import AdmZip from "adm-zip";
 import Axios from "axios";
 
-const U_WEBSOCKET_VERSION = "19.5.0";
+const U_WEBSOCKET_VERSION = "20.4.0";
 
 const download = async (url, dest) => {
     const writer = fs.createWriteStream(dest)

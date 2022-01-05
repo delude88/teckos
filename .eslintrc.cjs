@@ -43,7 +43,9 @@ module.exports = {
                 "endOfLine": "auto"
             },
         ],
-        "no-underscore-dangle": "off"
+        "no-underscore-dangle": "off",
+        "import/no-relative-packages": "off",
+        "@typescript-eslint/no-unsafe-argument": "off"
     },
     parserOptions: {
         project: './tsconfig.json'

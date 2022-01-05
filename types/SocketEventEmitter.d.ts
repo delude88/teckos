@@ -5,7 +5,10 @@ declare class SocketEventEmitter<T extends string> extends EventEmitter {
     protected _handlers: {
         [event: string]: ((...args: any[]) => void)[];
     };
+    protected _globalHandlers: ((event: string, args: any[]) => void)[];
     addListener: (event: T, listener: (...args: any[]) => void) => this;
+    addGlobalListener: (listener: (event: string, args: any[]) => void) => this;
+    removeGlobalListener: (listener: (event: string, args: any[]) => void) => this;
     once: (event: T, listener: (...args: any[]) => void) => this;
     removeListener: (event: T, listener: (...args: any[]) => void) => this;
     off: (event: T, listener: (...args: any[]) => void) => this;

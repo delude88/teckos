@@ -7,12 +7,24 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
         [event: string]: ((...args: any[]) => void)[]
     } = {}
 
+    protected _globalHandlers: ((event: string, args: any[]) => void)[] = []
+
     public addListener = (event: T, listener: (...args: any[]) => void): this => {
         if (Object.keys(this._handlers).length === this._maxListeners) {
             throw new Error('Max listeners reached')
         }
         this._handlers[event] = this._handlers[event] || []
         this._handlers[event].push(listener)
+        return this
+    }
+
+    public addGlobalListener = (listener: (event: string, args: any[]) => void): this => {
+        this._globalHandlers.push(listener)
+        return this
+    }
+
+    public removeGlobalListener = (listener: (event: string, args: any[]) => void): this => {
+        this._globalHandlers = this._globalHandlers.filter((curr) => curr === listener)
         return this
     }
 
@@ -44,6 +56,7 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
             delete this._handlers[event]
         } else {
             this._handlers = {}
+            this._globalHandlers = []
         }
         return this
     }
@@ -104,6 +117,7 @@ class SocketEventEmitter<T extends string> extends EventEmitter {
             listeners.forEach((listener) => listener(args))
             return true
         }
+        this._globalHandlers.forEach((listener) => listener(event, args))
         return false
     }
 }

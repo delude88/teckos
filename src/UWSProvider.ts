@@ -31,7 +31,8 @@ class UWSProvider implements ITeckosProvider {
         [uuid: string]: UWSSocket
     } = {}
 
-    private _handlers: ITeckosSocketHandler[] = []
+    // private _handlers: ITeckosSocketHandler[] = []
+    private _handler: ITeckosSocketHandler | undefined
 
     constructor(app: TemplatedApp, options?: TeckosOptions) {
         this._app = app
@@ -93,12 +94,12 @@ class UWSProvider implements ITeckosProvider {
                 // eslint-disable-next-line no-param-reassign
                 ws.alive = true
                 this._connections[id] = new UWSSocket(id, ws, options?.debug)
-                try {
-                    this._handlers.forEach((handler) => {
-                        handler(this._connections[id])
-                    })
-                } catch (handlerError) {
-                    console.error(handlerError)
+                if (this._handler) {
+                    try {
+                        this._handler(this._connections[id])
+                    } catch (handlerError) {
+                        console.error(handlerError)
+                    }
                 }
             },
             pong: (ws) => {
@@ -158,8 +159,8 @@ class UWSProvider implements ITeckosProvider {
         )
     }
 
-    onConnection = (handler: ITeckosSocketHandler): this => {
-        this._handlers.push(handler)
+    onConnection = (handler: ITeckosSocketHandler | undefined): this => {
+        this._handler = handler
         return this
     }
 

@@ -26,4 +26,6 @@ export interface ITeckosSocket extends events.EventEmitter {
     disconnect(): this
 
     getUserData(key: string): any
+
+    isClosed(): boolean
 }

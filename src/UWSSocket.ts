@@ -20,6 +20,8 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
 
     protected _debug?: boolean
 
+    protected _closed = false
+
     _handlers: {
         [event: string]: ((...args: any[]) => void)[]
     } = {}
@@ -59,6 +61,10 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
         })
     }
 
+    isClosed = (): boolean => {
+        return this._closed
+    }
+
     emit = (event: TeckosSocketEvent, ...args: any[]): boolean => {
         args.unshift(event)
 
@@ -78,7 +84,10 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     private _send = (packet: TeckosPacket): boolean => {
         if (this._debug)
             console.log(`Sending packet to ${this._id}:  ${JSON.stringify(packet.data)}`)
-        return this._ws.send(encodePacket(packet))
+        if (!this._closed) {
+            return this._ws.send(encodePacket(packet))
+        }
+        return false
     }
 
     private _ack = (id: number): ((...args: any[]) => void) => {
@@ -136,6 +145,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
 
     onDisconnect = (): void => {
         if (this._debug) console.log(`Client ${this._id} disconnected`)
+        this._closed = true
         if (this._handlers.disconnect) {
             this._handlers.disconnect.forEach((handler) => handler())
         }
@@ -146,6 +156,7 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     disconnect = (): this => {
         if (this._debug) console.log(`Disconnecting ${this._id}`)
         this._ws.close()
+        this._closed = true
         return this
     }
 

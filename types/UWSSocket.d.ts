@@ -9,6 +9,7 @@ declare class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements
     protected _acks: Map<number, (...args: any[]) => void>;
     protected _maxListeners: number;
     protected _debug?: boolean;
+    protected _closed: boolean;
     _handlers: {
         [event: string]: ((...args: any[]) => void)[];
     };
@@ -18,6 +19,7 @@ declare class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements
     join: (group: string) => this;
     leave: (group: string) => this;
     send: (...args: any[]) => boolean;
+    isClosed: () => boolean;
     emit: (event: TeckosSocketEvent, ...args: any[]) => boolean;
     private _send;
     private _ack;

@@ -8,10 +8,10 @@ declare class UWSProvider implements ITeckosProvider {
     private readonly _pub;
     private readonly _sub;
     private _connections;
-    private _handlers;
+    private _handler;
     constructor(app: TemplatedApp, options?: TeckosOptions);
     private _keepAliveSockets;
-    onConnection: (handler: ITeckosSocketHandler) => this;
+    onConnection: (handler: ITeckosSocketHandler | undefined) => this;
     toAll: (event: string, ...args: any[]) => this;
     to: (group: string, event: string, ...args: any[]) => this;
     listen: (port: number) => Promise<any>;

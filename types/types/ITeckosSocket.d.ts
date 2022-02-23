@@ -15,5 +15,6 @@ export interface ITeckosSocket extends events.EventEmitter {
     error(message?: string): boolean;
     disconnect(): this;
     getUserData(key: string): any;
+    isClosed(): boolean;
 }
 //# sourceMappingURL=ITeckosSocket.d.ts.map

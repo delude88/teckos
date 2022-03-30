@@ -57,7 +57,7 @@ class UWSProvider implements ITeckosProvider {
             // Since we are only subscribing to a,
             // no further checks are necessary (trusting ioredis here)
             this._sub.on('message', (channel: string, message: Buffer | string) =>
-                this._app.publish(channel.substr(2), message)
+                this._app.publish(channel.substring(2), message)
             )
 
             this._sub.psubscribe('g.*', (err) => {
@@ -68,7 +68,7 @@ class UWSProvider implements ITeckosProvider {
             // Since we are only p-subscribing to g.*,
             // no further checks are necessary (trusting ioredis here)
             this._sub.on('pmessage', (_channel, pattern: string, message: Buffer | string) => {
-                const group = pattern.substr(2)
+                const group = pattern.substring(2)
                 if (this._options.debug)
                     console.log(`Publishing message from REDIS to group ${group}`)
                 this._app.publish(group, message)

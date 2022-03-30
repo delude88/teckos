@@ -1,6 +1,6 @@
 {
   "name": "teckos",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "main": "./lib/index.cjs",
   "module": "./lib/index.mjs",
@@ -97,6 +97,6 @@
     "rimraf": "^3.0.2"
   },
   "peerDependencies": {
-    "ioredis": "^4.27.9"
+    "ioredis": "^5.0.2"
   }
 }

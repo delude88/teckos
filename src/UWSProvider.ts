@@ -56,10 +56,16 @@ class UWSProvider implements ITeckosProvider {
             })
             // Since we are only subscribing to a,
             // no further checks are necessary (trusting ioredis here)
-            this._sub.on('message', (channel: string, message: Buffer | string) =>
-                this._app.publish(channel.substring(2), message)
-            )
+            this._sub.on('message', (channel: string, message: Buffer | string) => {
+                const group = channel.substring(2)
+                if (channel.charAt(0) === 'd') {
+                    this._disconnectGroup(group)
+                } else {
+                    this._app.publish(group, message)
+                }
+            })
 
+            // Group publishing
             this._sub.psubscribe('g.*', (err) => {
                 if (err) {
                     console.error(err.message)
@@ -159,6 +165,15 @@ class UWSProvider implements ITeckosProvider {
         )
     }
 
+    private _disconnectGroup = (group: string) => {
+        const connections = Object.values(this._connections)
+        connections.forEach((connection) => {
+            if (connection.ws.isSubscribed(group)) {
+                connection.disconnect()
+            }
+        })
+    }
+
     onConnection = (handler: ITeckosSocketHandler | undefined): this => {
         this._handler = handler
         return this
@@ -190,6 +205,16 @@ class UWSProvider implements ITeckosProvider {
         } else {
             if (this._options.debug) console.log(`Publishing event ${event} to group ${group}`)
             this._app.publish(group, buffer)
+        }
+        return this
+    }
+
+    disconnect(group: string): this {
+        if (this._pub) {
+            this._pub.publish(`d.${group}`, '').catch((err) => console.error(err))
+        } else {
+            if (this._options.debug) console.log(`Disconnecting whole group ${group}`)
+            this._disconnectGroup(group)
         }
         return this
     }

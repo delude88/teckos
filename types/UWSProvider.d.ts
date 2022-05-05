@@ -11,9 +11,11 @@ declare class UWSProvider implements ITeckosProvider {
     private _handler;
     constructor(app: TemplatedApp, options?: TeckosOptions);
     private _keepAliveSockets;
+    private _disconnectGroup;
     onConnection: (handler: ITeckosSocketHandler | undefined) => this;
     toAll: (event: string, ...args: any[]) => this;
     to: (group: string, event: string, ...args: any[]) => this;
+    disconnect(group: string): this;
     listen: (port: number) => Promise<any>;
 }
 export { UWSProvider };

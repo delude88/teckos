@@ -1,6 +1,6 @@
 {
   "name": "teckos",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "uWebsocket.js based server component supporting async callbacks",
   "type": "module",
   "exports": "./lib/index.js",
@@ -24,7 +24,7 @@
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register '__tests__/**/*.ts'",
     "build": "rimraf lib types && node esbuild.config.js && npm run ts-types && npm run es-check",
     "lint": "npx eslint ./src --ext .ts",
-    "preversion": "npm run lint && npm run build && npm run es-check && rimraf uws/*",
+    "preversion": "npm run lint && npm run build && npm run es-check && rimraf uws/*.node",
     "version": "git add -A src",
     "postversion": "git push && git push --tags"
   },

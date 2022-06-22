@@ -1,11 +1,11 @@
-/* eslint-disable no-console */
-import { WebSocket } from '../uws'
-import { SocketEventEmitter } from './SocketEventEmitter'
-import { decodePacket, encodePacket } from './util/Converter'
-import { TeckosSocketEvent } from './types/TeckosSocketEvent'
-import { TeckosPacket } from './types/TeckosPacket'
-import { ITeckosSocket } from './types/ITeckosSocket'
-import { ACK, EVENT } from './types/TeckosPacketType'
+/* eslint-disable no-console,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
+import { WebSocket } from 'uws'
+import { SocketEventEmitter } from './SocketEventEmitter.js'
+import { decodePacket, encodePacket } from './util/Converter.js'
+import { TeckosSocketEvent } from './types/TeckosSocketEvent.js'
+import { TeckosPacket } from './types/TeckosPacket.js'
+import { ITeckosSocket } from './types/ITeckosSocket.js'
+import { ACK, EVENT } from './types/TeckosPacketType.js'
 
 class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckosSocket {
     protected readonly _id: string

@@ -1,13 +1,10 @@
 {
   "name": "uWebSockets.js",
-  "version": "19.5.0",
-  "main": "./index.cjs",
-  "module": "./index.mjs",
+  "version": "20.10.0",
+  "main": "uws.js",
+  "types": "./index.d.ts",
   "exports": {
-    ".": {
-      "import": "./index.mjs",
-      "require": "./index.cjs"
-    }
-  },
-  "types": "./index.d.ts"
+    "import": "./ESM_wrapper.mjs",
+    "require": "./uws.js"
+  }
 }

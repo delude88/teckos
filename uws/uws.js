@@ -1,5 +1,5 @@
 /*
- * Authored by Alex Hultman, 2018-2021.
+ * Authored by Alex Hultman, 2018-2022.
  * Intellectual property of third-party.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,10 @@
  * limitations under the License.
  */
 
-import {createRequire} from 'module';
-
-const localRequire = createRequire(import.meta.url);
-
-export default (() => {
-    try {
-        return localRequire('./uws_' + process.platform + '_' + process.arch + '_' + process.versions.modules + '.node');
-    } catch (e) {
-        throw new Error('This version of µWS is not compatible with your Node.js build:\n\n' + e.toString());
-    }
+module.exports = (() => {
+	try {
+		return require('./uws_' + process.platform + '_' + process.arch + '_' + process.versions.modules + '.node');
+	} catch (e) {
+		throw new Error('This version of uWS.js supports only Node.js 14, 16 and 18 on (glibc) Linux, macOS and Windows, on Tier 1 platforms (https://github.com/nodejs/node/blob/master/BUILDING.md#platform-list).\n\n' + e.toString());
+	}
 })();

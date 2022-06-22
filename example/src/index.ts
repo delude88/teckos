@@ -26,10 +26,8 @@ const start = async () => {
       }
     });
 
-    socket.on('no-args', (bla) => {
+    socket.on('no-args', () => {
       console.log("Got 'no-args'");
-      console.log('Expect the following to be catched:');
-      bla();
     });
 
     socket.on('hello', (firstName, lastName) => {

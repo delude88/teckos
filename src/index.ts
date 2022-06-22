@@ -1,10 +1,11 @@
-import { ITeckosProvider } from './types/ITeckosProvider'
-import { ITeckosSocket } from './types/ITeckosSocket'
-import { TeckosPacket } from './types/TeckosPacket'
-import uws from '../uws'
-import { UWSProvider } from './UWSProvider'
-import { UWSSocket } from './UWSSocket'
-import { UWSProviderWithToken } from './UWSProviderWithToken'
+import { ITeckosProvider } from './types/ITeckosProvider.js'
+import { ITeckosSocket } from './types/ITeckosSocket.js'
+import { TeckosPacket } from './types/TeckosPacket.js'
+import { UWSProvider } from './UWSProvider.js'
+import { UWSSocket } from './UWSSocket.js'
+import { UWSProviderWithToken } from './UWSProviderWithToken.js'
+
+export * from 'uws'
 
 export type { TeckosPacket, ITeckosSocket, ITeckosProvider }
-export { UWSSocket, UWSProvider, UWSProviderWithToken, uws }
+export { UWSSocket, UWSProvider, UWSProviderWithToken }

@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-import { TemplatedApp } from '../uws'
-import { TeckosOptions } from './types/TeckosOptions'
-import { ITeckosSocket } from './types/ITeckosSocket'
-import { UWSProvider } from './UWSProvider'
+import { TemplatedApp } from 'uws'
+import { TeckosOptions } from './types/TeckosOptions.js'
+import { ITeckosSocket } from './types/ITeckosSocket.js'
+import { UWSProvider } from './UWSProvider.js'
 
 export type TokenHandler = (token: string, initialPayload?: any) => Promise<boolean> | boolean
 

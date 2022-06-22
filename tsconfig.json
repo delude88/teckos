@@ -1,15 +1,15 @@
 {
+  // Best: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
   "compilerOptions": {
-    "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "target": "esnext",
-    "module": "esnext",
-    "lib": ["esnext", "dom"],
+    "target": "es2020",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "lib": ["es2020", "dom"],
     "strict": true,
     "noImplicitAny": false,
     "esModuleInterop": true,
-    "moduleResolution": "node",
     "declarationMap": true,
     "isolatedModules": true,
     "outDir": "types"
@@ -20,6 +20,6 @@
   "exclude": [
     "node_modules",
     "lib",
-    "uws",
+    "uws"
   ]
 }

@@ -48,12 +48,11 @@ export type RecognizedString = string | ArrayBuffer | Uint8Array | Int8Array | U
  * Read more about this in the user manual.
  */
 export interface WebSocket {
-    /** Sends a message. Make sure to check getBufferedAmount() before sending. Returns true for success, false for built up backpressure that will drain when time is given.
-     * Returning false does not mean nothing was sent, it only means backpressure was built up. This you can check by calling getBufferedAmount() afterwards.
+    /** Sends a message. Returns 1 for success, 2 for dropped due to backpressure limit, and 0 for built up backpressure that will drain over time. You can check backpressure before or after sending by calling getBufferedAmount(). 
      *
      * Make sure you properly understand the concept of backpressure. Check the backpressure example file.
      */
-    send(message: RecognizedString, isBinary?: boolean, compress?: boolean) : boolean;
+    send(message: RecognizedString, isBinary?: boolean, compress?: boolean) : number;
 
     /** Returns the bytes buffered in backpressure. This is similar to the bufferedAmount property in the browser counterpart.
      * Check backpressure example.
@@ -63,23 +62,17 @@ export interface WebSocket {
     /** Gracefully closes this WebSocket. Immediately calls the close handler.
      * A WebSocket close message is sent with code and shortMessage.
      */
-    end(code?: number, shortMessage?: RecognizedString) : WebSocket;
+    end(code?: number, shortMessage?: RecognizedString) : void;
 
     /** Forcefully closes this WebSocket. Immediately calls the close handler.
      * No WebSocket close message is sent.
      */
-    close() : WebSocket;
+    close() : void;
 
-    /** Sends a ping control message. Returns true on success in similar ways as WebSocket.send does (regarding backpressure). This helper function correlates to WebSocket::send(message, uWS::OpCode::PING, ...) in C++. */
-    ping(message?: RecognizedString) : boolean;
+    /** Sends a ping control message. Returns sendStatus similar to WebSocket.send (regarding backpressure). This helper function correlates to WebSocket::send(message, uWS::OpCode::PING, ...) in C++. */
+    ping(message?: RecognizedString) : number;
 
-    /** Subscribe to a topic in MQTT syntax.
-     *
-     * MQTT syntax includes things like "root/child/+/grandchild" where "+" is a
-     * wildcard and "root/#" where "#" is a terminating wildcard.
-     *
-     * Read more about MQTT.
-    */
+    /** Subscribe to a topic. */
     subscribe(topic: RecognizedString) : boolean;
 
     /** Unsubscribe from a topic. Returns true on success, if the WebSocket was subscribed. */
@@ -91,20 +84,13 @@ export interface WebSocket {
     /** Returns a list of topics this websocket is subscribed to. */
     getTopics() : string[];
 
-    /** Publish a message to a topic in MQTT syntax. You cannot publish using wildcards, only fully specified topics. Just like with MQTT.
-     *
-     * "parent/child" kind of tree is allowed, but not "parent/#" kind of wildcard publishing.
-     *
-     * The pub/sub system does not guarantee order between what you manually send using WebSocket.send
-     * and what you publish using WebSocket.publish. WebSocket messages are perfectly atomic, but the order in which they appear can get scrambled if you mix the two sending functions on the same socket.
-     * This shouldn't matter in most applications. Order is guaranteed relative to other calls to WebSocket.publish.
-     *
-     * Also keep in mind that backpressure will be automatically managed with pub/sub, meaning some outgoing messages may be dropped if backpressure is greater than specified maxBackpressure.
+    /** Publish a message under topic. Backpressure is managed according to maxBackpressure, closeOnBackpressureLimit settings.
+     * Order is guaranteed since v20.
     */
     publish(topic: RecognizedString, message: RecognizedString, isBinary?: boolean, compress?: boolean) : boolean;
 
     /** See HttpResponse.cork. Takes a function in which the socket is corked (packing many sends into one single syscall/SSL block) */
-    cork(cb: () => void) : void;
+    cork(cb: () => void) : WebSocket;
 
     /** Returns the remote IP address. Note that the returned IP is binary, not text.
      *
@@ -143,8 +129,8 @@ export interface HttpResponse {
      * See writeStatus and corking.
     */
     writeHeader(key: RecognizedString, value: RecognizedString) : HttpResponse;
-    /** Enters or continues chunked encoding mode. Writes part of the response. End with zero length write. */
-    write(chunk: RecognizedString) : HttpResponse;
+    /** Enters or continues chunked encoding mode. Writes part of the response. End with zero length write. Returns true if no backpressure was added. */
+    write(chunk: RecognizedString) : boolean;
     /** Ends this response by copying the contents of body. */
     end(body?: RecognizedString, closeConnection?: boolean) : HttpResponse;
     /** Ends this response, or tries to, by streaming appropriately sized chunks of body. Use in conjunction with onWritable. Returns tuple [ok, hasResponded].*/
@@ -164,7 +150,7 @@ export interface HttpResponse {
 
     /** Every HttpResponse MUST have an attached abort handler IF you do not respond
      * to it immediately inside of the callback. Returning from an Http request handler
-     * without attaching (by calling onAborted) an abort handler is ill-use and will termiante.
+     * without attaching (by calling onAborted) an abort handler is ill-use and will terminate.
      * When this event emits, the response has been aborted and may not be used. */
     onAborted(handler: () => void) : HttpResponse;
 
@@ -196,7 +182,7 @@ export interface HttpResponse {
      *   res.writeStatus("200 OK").writeHeader("Some", "Value").write("Hello world!");
      * });
      */
-    cork(cb: () => void) : void;
+    cork(cb: () => void) : HttpResponse;
 
     /** Upgrades a HttpResponse to a WebSocket. See UpgradeAsync, UpgradeSync example files. */
     upgrade<T>(userData : T, secWebSocketKey: RecognizedString, secWebSocketProtocol: RecognizedString, secWebSocketExtensions: RecognizedString, context: us_socket_context_t) : void;
@@ -237,6 +223,8 @@ export interface WebSocketBehavior {
     compression?: CompressOptions;
     /** Maximum length of allowed backpressure per socket when publishing or sending messages. Slow receivers with too high backpressure will be skipped until they catch up or timeout. Defaults to 1024 * 1024. */
     maxBackpressure?: number;
+    /** Whether or not we should automatically send pings to uphold a stable connection given whatever idleTimeout. */
+    sendPingsAutomatically?: boolean;
     /** Upgrade handler used to intercept HTTP upgrade requests and potentially upgrade to WebSocket.
      * See UpgradeAsync and UpgradeSync example files.
      */
@@ -261,6 +249,7 @@ export interface WebSocketBehavior {
 export interface AppOptions {
     key_file_name?: RecognizedString;
     cert_file_name?: RecognizedString;
+    ca_file_name?: RecognizedString;
     passphrase?: RecognizedString;
     dh_params_file_name?: RecognizedString;
     /** This translates to SSL_MODE_RELEASE_BUFFERS */
@@ -338,12 +327,14 @@ export interface MultipartField {
 /** Takes a POSTed body and contentType, and returns an array of parts if the request is a multipart request */
 export function getParts(body: RecognizedString, contentType: RecognizedString): MultipartField[] | undefined;
 
-/** WebSocket compression options */
+/** WebSocket compression options. Combine any compressor with any decompressor using bitwise OR. */
 export type CompressOptions = number;
 /** No compression (always a good idea if you operate using an efficient binary protocol) */
 export var DISABLED: CompressOptions;
-/** Zero memory overhead compression (recommended for pub/sub where same message is sent to many receivers) */
+/** Zero memory overhead compression. */
 export var SHARED_COMPRESSOR: CompressOptions;
+/** Zero memory overhead decompression. */
+export var SHARED_DECOMPRESSOR: CompressOptions;
 /** Sliding dedicated compress window, requires 3KB of memory per socket */
 export var DEDICATED_COMPRESSOR_3KB: CompressOptions;
 /** Sliding dedicated compress window, requires 4KB of memory per socket */
@@ -360,3 +351,19 @@ export var DEDICATED_COMPRESSOR_64KB: CompressOptions;
 export var DEDICATED_COMPRESSOR_128KB: CompressOptions;
 /** Sliding dedicated compress window, requires 256KB of memory per socket */
 export var DEDICATED_COMPRESSOR_256KB: CompressOptions;
+/** Sliding dedicated decompress window, requires 32KB of memory per socket (plus about 23KB) */
+export var DEDICATED_DECOMPRESSOR_32KB: CompressOptions;
+/** Sliding dedicated decompress window, requires 16KB of memory per socket (plus about 23KB) */
+export var DEDICATED_DECOMPRESSOR_16KB: CompressOptions;
+/** Sliding dedicated decompress window, requires 8KB of memory per socket (plus about 23KB) */
+export var DEDICATED_DECOMPRESSOR_8KB: CompressOptions;
+/** Sliding dedicated decompress window, requires 4KB of memory per socket (plus about 23KB) */
+export var DEDICATED_DECOMPRESSOR_4KB: CompressOptions;
+/** Sliding dedicated decompress window, requires 2KB of memory per socket (plus about 23KB) */
+export var DEDICATED_DECOMPRESSOR_2KB: CompressOptions;
+/** Sliding dedicated decompress window, requires 1KB of memory per socket (plus about 23KB) */
+export var DEDICATED_DECOMPRESSOR_1KB: CompressOptions;
+/** Sliding dedicated decompress window, requires 512B of memory per socket (plus about 23KB) */
+export var DEDICATED_DECOMPRESSOR_512B: CompressOptions;
+/** Sliding dedicated decompress window, requires 32KB of memory per socket (plus about 23KB) */
+export var DEDICATED_DECOMPRESSOR: CompressOptions;

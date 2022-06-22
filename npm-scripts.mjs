@@ -19,37 +19,29 @@ const download = async (url, dest) => {
     })
 };
 
-const buildBinaries = async () => {
-    if (!fs.existsSync(`./binaries-${U_WEBSOCKET_VERSION}.zip`)) {
-        console.log("Downloading node binaries...")
-        await download("https://github.com/uNetworking/uWebSockets.js/archive/refs/tags/v" + U_WEBSOCKET_VERSION + ".zip", `./binaries-${U_WEBSOCKET_VERSION}.zip`)
-            .catch((error) => {
-                fs.rmSync(`./binaries-${U_WEBSOCKET_VERSION}.zip`)
-                console.error(error)
-            })
-    }
+const downloadUWS = async () => {
     const hasNoBinaries = !fs.existsSync("./uws") || !fs.readdirSync('./uws').find(file => file.endsWith(".node"))
     if (hasNoBinaries) {
         try {
+            console.log("Downloading node binaries...")
+            await download(`https://github.com/uNetworking/uWebSockets.js/archive/refs/tags/v${U_WEBSOCKET_VERSION}.zip`, `./binaries-${U_WEBSOCKET_VERSION}.zip`)
             console.log("Extracting node binaries...")
             const zip = new AdmZip(`./binaries-${U_WEBSOCKET_VERSION}.zip`)
             zip.extractAllTo(".", true)
-            if (!fs.existsSync("./uws")) {
-                fs.mkdirSync("./uws")
-            }
-            fs.readdirSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
+            fs.readdirSync(`./uWebSockets.js-${U_WEBSOCKET_VERSION}`)
                 .forEach(file => {
                     if (file.endsWith(".node")) {
                         fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./uws/" + file)
                     }
                 })
-            rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
+            rimraf.sync(`./uWebSockets.js-${U_WEBSOCKET_VERSION}`)
+            rimraf.sync(`./binaries-${U_WEBSOCKET_VERSION}.zip`)
         } catch (err) {
             console.error(err)
-            rimraf.sync("./uWebSockets.js-" + U_WEBSOCKET_VERSION)
-            rimraf.sync("./uws")
+            rimraf.sync(`./binaries-${U_WEBSOCKET_VERSION}.zip`)
+            rimraf.sync(`./uWebSockets.js-${U_WEBSOCKET_VERSION}`)
         }
     }
 };
 
-buildBinaries()
+downloadUWS()

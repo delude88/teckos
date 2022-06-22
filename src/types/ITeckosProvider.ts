@@ -1,4 +1,4 @@
-import { ITeckosSocketHandler } from './ITeckosSocketHandler'
+import { ITeckosSocketHandler } from './ITeckosSocketHandler.js'
 
 export interface ITeckosProvider {
     onConnection(handler: ITeckosSocketHandler): this

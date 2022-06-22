@@ -1,3 +1,3 @@
-import { ITeckosSocket } from './ITeckosSocket'
+import { ITeckosSocket } from './ITeckosSocket.js'
 
 export type ITeckosSocketHandler = (socket: ITeckosSocket) => any

@@ -1,7 +1,7 @@
 import 'mocha'
 import {expect} from 'chai'
 import {ITeckosClient, TeckosClientWithJWT} from 'teckos-client'
-import {uws, UWSProvider, UWSProviderWithToken} from "../src";
+import {UWSProvider, UWSProviderWithToken, App} from "../src";
 
 const PORT = 3000
 
@@ -12,7 +12,7 @@ describe('Example connection using JWT', () => {
 
   before((done) => {
     // Create server and client
-    const app = uws.App()
+    const app = App()
     server = new UWSProviderWithToken(app, (reqToken) => {
       return reqToken === token
     })

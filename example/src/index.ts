@@ -1,15 +1,14 @@
-import {uws, UWSProvider} from 'teckos';
+import { uws, UWSProvider } from 'teckos';
 
-
-const redisUrl: string | undefined = "redis://localhost"
+const redisUrl: string | undefined = 'redis://localhost';
 const PORT: number = 4000;
 
 const start = async () => {
   const app = uws.App();
   const io = new UWSProvider(app, {
-    redisUrl: redisUrl,
+    redisUrl,
     pingInterval: 2000,
-    debug: true
+    debug: true,
   });
   io.onConnection((socket) => {
     socket.join('usergroup');

@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
-import IORedis from 'ioredis'
+import Redis from 'ioredis'
 import * as crypto from 'crypto'
-import { UWSSocket } from './UWSSocket.js'
-import { encodePacket } from './util/Converter.js'
-import { ITeckosSocketHandler } from './types/ITeckosSocketHandler.js'
-import { ITeckosProvider } from './types/ITeckosProvider.js'
-import { TeckosOptions } from './types/TeckosOptions.js'
-import { EVENT } from './types/TeckosPacketType.js'
-import { TemplatedApp, uws } from './uws/index.js'
+import { UWSSocket } from './UWSSocket'
+import { encodePacket } from './util/Converter'
+import { ITeckosSocketHandler } from './types/ITeckosSocketHandler'
+import { ITeckosProvider } from './types/ITeckosProvider'
+import { TeckosOptions } from './types/TeckosOptions'
+import { EVENT } from './types/TeckosPacketType'
+import { TemplatedApp, uws } from './uws'
 
 const DEFAULT_OPTION: TeckosOptions = {
     pingInterval: 25000,
@@ -23,9 +23,9 @@ class UWSProvider implements ITeckosProvider {
 
     private readonly _options: TeckosOptions
 
-    private readonly _pub: IORedis.Redis | undefined
+    private readonly _pub: Redis | undefined
 
-    private readonly _sub: IORedis.Redis | undefined
+    private readonly _sub: Redis | undefined
 
     private _connections: {
         [uuid: string]: UWSSocket
@@ -47,16 +47,16 @@ class UWSProvider implements ITeckosProvider {
         if (redisUrl) {
             if (this._options.debug) console.log(`Using REDIS at ${redisUrl}`)
             // eslint-disable-next-line new-cap
-            this._pub = new IORedis.default(redisUrl)
+            this._pub = new Redis(redisUrl)
             // eslint-disable-next-line new-cap
-            this._sub = new IORedis.default(redisUrl)
+            this._sub = new Redis(redisUrl)
 
             // All publishing
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
             this._sub.subscribe('a', (err) => err && console.error(err.message))
             // Since we are only subscribing to a,
             // no further checks are necessary (trusting ioredis here)
-            this._sub.on('messageBuffer', (channelBuffer: Buffer, buffer: Buffer) => {
+            this._sub.on('messageBuffer', (_channel, buffer: Buffer) => {
                 // Should only be a, so ...
                 if (this._options.debug) {
                     console.log(`Publishing message from REDIS to all`)

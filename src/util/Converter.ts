@@ -1,4 +1,4 @@
-import { TeckosPacket } from '../types/TeckosPacket.js'
+import { TeckosPacket } from '../types/TeckosPacket'
 
 const encodePacket = (packet: TeckosPacket): Buffer => Buffer.from(JSON.stringify(packet))
 const decodePacket = (buffer: ArrayBuffer): TeckosPacket => {

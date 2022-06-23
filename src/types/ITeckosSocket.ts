@@ -1,7 +1,7 @@
 import * as events from 'events'
 // eslint-disable-next-line import/extensions
-import * as uws from '../uws/index.js'
-import { TeckosSocketEvent } from './TeckosSocketEvent.js'
+import * as uws from '../uws/index'
+import { TeckosSocketEvent } from './TeckosSocketEvent'
 
 export interface ITeckosSocket extends events.EventEmitter {
     id: string

@@ -24,7 +24,7 @@ export default defineConfig([
     // CommonJS
     {
         input: 'src/index.ts',
-        output: { file: 'lib/index.js', format: 'cjs', indent: false },
+        output: { file: 'lib/teckos.js', format: 'cjs', indent: false },
         external,
         plugins: [
             nodeResolve({
@@ -45,7 +45,7 @@ export default defineConfig([
     // ES
     {
         input: 'src/index.ts',
-        output: { file: 'es/index.js', format: 'es', indent: false },
+        output: { file: 'es/teckos.js', format: 'es', indent: false },
         external,
         plugins: [
             nodeResolve({
@@ -69,7 +69,8 @@ export default defineConfig([
     // ES for Browsers
     {
         input: 'src/index.ts',
-        output: { file: 'es/index.mjs', format: 'es', indent: false },
+        output: { file: 'es/teckos.mjs', format: 'es', indent: false },
+        external: ["ioredis"],
         plugins: [
             nodeResolve({
                 extensions
@@ -95,66 +96,4 @@ export default defineConfig([
             })
         ]
     },
-
-    // UMD Development
-    {
-        input: 'src/index.ts',
-        output: {
-            file: 'dist/index.js',
-            format: 'umd',
-            name: 'Teckos Client',
-            indent: false
-        },
-        plugins: [
-            nodeResolve({
-                extensions
-            }),
-            typescript({ tsconfigOverride: noDeclarationFiles }),
-            babel({
-                extensions,
-                exclude: 'node_modules/**',
-                plugins: [['./scripts/mangleErrors.js', { minify: false }]],
-                babelHelpers: 'bundled'
-            }),
-            replace({
-                preventAssignment: true,
-                'process.env.NODE_ENV': JSON.stringify('development')
-            })
-        ]
-    },
-
-    // UMD Production
-    {
-        input: 'src/index.ts',
-        output: {
-            file: 'dist/index.min.js',
-            format: 'umd',
-            name: 'Teckos Client',
-            indent: false
-        },
-        plugins: [
-            nodeResolve({
-                extensions
-            }),
-            typescript({ tsconfigOverride: noDeclarationFiles }),
-            babel({
-                extensions,
-                exclude: 'node_modules/**',
-                plugins: [['./scripts/mangleErrors.js', { minify: true }]],
-                skipPreflightCheck: true,
-                babelHelpers: 'bundled'
-            }),
-            replace({
-                preventAssignment: true,
-                'process.env.NODE_ENV': JSON.stringify('production')
-            }),
-            terser({
-                compress: {
-                    pure_getters: true,
-                    unsafe: true,
-                    unsafe_comps: true
-                }
-            })
-        ]
-    }
 ])

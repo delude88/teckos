@@ -1,0 +1,5 @@
+{
+  "0": "This version of uWS.js supports only Node.js 14, 16 and 18 on (glibc) Linux, macOS and Windows, on Tier 1 platforms (https://github.com/nodejs/node/blob/master/BUILDING.md#platform-list).\\n\\n",
+  "1": "Max listeners reached",
+  "2": "Invalid packet format: "
+}

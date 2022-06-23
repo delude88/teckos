@@ -1,27 +1,21 @@
 {
-  // Best: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
   "compilerOptions": {
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "target": "es2020",
-    "module": "node16",
-    "moduleResolution": "node16",
-    "lib": ["es2020", "dom"],
-    "noImplicitAny": false,
-    "declarationMap": true,
-    "isolatedModules": true,
-    "outDir": "types",
+    "strict": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
-    "strict": true
+    "skipLibCheck": true,
+    "lib": ["dom", "es2017"],
+    "jsx": "react",
+    "declaration": true,
+    "declarationDir": "./types",
+    "sourceMap": true,
+    "removeComments": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "baseUrl": "./"
   },
-  "include": [
-    "./src/**/*.ts"
-  ],
-  "exclude": [
-    "bin",
-    "example",
-    "types",
-    "node_modules",
-    "lib"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

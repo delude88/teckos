@@ -14,7 +14,6 @@
   "author": "Tobias Hegemann <tobias.hegemann@googlemail.com>",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.0.1",
     "ioredis": "^5.0.6",
     "teckos": "file:.."
   },

@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,no-console,no-param-reassign */
+/* eslint-disable no-console */
 import IORedis from 'ioredis'
 import * as crypto from 'crypto'
-import { TemplatedApp, SHARED_DECOMPRESSOR, WebSocket } from 'uws'
 import { UWSSocket } from './UWSSocket.js'
 import { encodePacket } from './util/Converter.js'
 import { ITeckosSocketHandler } from './types/ITeckosSocketHandler.js'
 import { ITeckosProvider } from './types/ITeckosProvider.js'
 import { TeckosOptions } from './types/TeckosOptions.js'
 import { EVENT } from './types/TeckosPacketType.js'
+import { TemplatedApp, uws } from './uws/index.js'
 
 const DEFAULT_OPTION: TeckosOptions = {
     pingInterval: 25000,
@@ -46,57 +46,65 @@ class UWSProvider implements ITeckosProvider {
         const { redisUrl } = this._options
         if (redisUrl) {
             if (this._options.debug) console.log(`Using REDIS at ${redisUrl}`)
-            this._pub = new IORedis(redisUrl)
-            this._sub = new IORedis(redisUrl)
+            // eslint-disable-next-line new-cap
+            this._pub = new IORedis.default(redisUrl)
+            // eslint-disable-next-line new-cap
+            this._sub = new IORedis.default(redisUrl)
 
-            this._sub.subscribe('a', (err) => {
-                if (err) {
-                    // eslint-disable-next-line no-console
-                    console.error(err.message)
-                }
-            })
+            // All publishing
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            this._sub.subscribe('a', (err) => err && console.error(err.message))
             // Since we are only subscribing to a,
             // no further checks are necessary (trusting ioredis here)
-            this._sub.on('message', (channel: string, message: Buffer | string) => {
-                const group = channel.substring(2)
-                if (channel.charAt(0) === 'd') {
-                    this._disconnectGroup(group)
-                } else {
-                    this._app.publish(group, message)
+            this._sub.on('messageBuffer', (channelBuffer: Buffer, buffer: Buffer) => {
+                // Should only be a, so ...
+                if (this._options.debug) {
+                    console.log(`Publishing message from REDIS to all`)
                 }
+                this._app.publish('a', buffer)
             })
 
             // Group publishing
-            this._sub.psubscribe('g.*', (err) => {
-                if (err) {
-                    console.error(err.message)
-                }
-            })
-            // Since we are only p-subscribing to g.*,
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            this._sub.psubscribe('g.*', 'd.*', (err) => err && console.error(err.message))
+            // Since we are only p-subscribing to g.* and d.*,
             // no further checks are necessary (trusting ioredis here)
-            this._sub.on('pmessage', (_channel, pattern: string, message: Buffer | string) => {
-                const group = pattern.substring(2)
-                if (this._options.debug) {
-                    console.log(`Publishing message from REDIS to group ${group}`)
+            this._sub.on('pmessageBuffer', (_pattern, channelBuffer: Buffer, message: Buffer) => {
+                const channel = channelBuffer.toString()
+                const action = channel.charAt(0)
+                const group = channel.substring(2)
+                if (action === 'd') {
+                    if (this._options.debug) {
+                        console.log(
+                            `Disconnecting everybody in group ${group} due to message from REDIS`
+                        )
+                    }
+                    this._disconnectGroup(group)
+                } else if (action === 'g') {
+                    if (this._options.debug) {
+                        console.log(`Publishing message from REDIS to group ${group}`)
+                    }
+                    this._app.publish(group, message)
                 }
-                this._app.publish(group, message)
             })
         }
         this._app.ws('/*', {
             /* Options */
-            compression: SHARED_DECOMPRESSOR,
+            compression: uws.SHARED_DECOMPRESSOR,
             maxPayloadLength: 16 * 1024 * 1024,
             idleTimeout: 0,
             maxBackpressure: 1024,
 
-            open: (ws: WebSocket) => {
+            open: (ws) => {
                 const id: string = generateUUID()
                 /* Let this client listen to all sensor topics */
 
                 // Subscribe to all
                 ws.subscribe('a')
 
+                // eslint-disable-next-line no-param-reassign
                 ws.id = id
+                // eslint-disable-next-line no-param-reassign
                 ws.alive = true
                 this._connections[id] = new UWSSocket(id, ws, options?.debug)
                 if (this._handler) {
@@ -109,9 +117,11 @@ class UWSProvider implements ITeckosProvider {
                 }
             },
             pong: (ws) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,no-param-reassign
                 ws.alive = true
             },
-            message: (ws: WebSocket, buffer: ArrayBuffer) => {
+            message: (ws, buffer) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (this._connections[id]) {
                     this._connections[id].onMessage(buffer)
@@ -119,11 +129,13 @@ class UWSProvider implements ITeckosProvider {
                     console.error(`Got message from unknown connection: ${id}`)
                 }
             },
-            drain: (ws: WebSocket) => {
+            drain: (ws) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (options?.debug) console.log(`Drain: ${id}`)
             },
-            close: (ws: WebSocket) => {
+            close: (ws) => {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const id = ws.id as string
                 if (this._connections[id]) {
                     if (this._options.debug) {
@@ -183,9 +195,9 @@ class UWSProvider implements ITeckosProvider {
             data: args,
         })
         if (this._pub) {
-            this._pub.publishBuffer('a', buffer).catch((err) => console.error(err))
+            this._pub.publish('a', buffer).catch((err) => console.error(err))
         } else {
-            if (this._options.debug) console.log(`Publishing event ${event} to group a`)
+            if (this._options.debug) console.log(`Publishing event ${event} to all`)
             this._app.publish('a', buffer)
         }
         return this
@@ -198,7 +210,7 @@ class UWSProvider implements ITeckosProvider {
             data: args,
         })
         if (this._pub) {
-            this._pub.publishBuffer(`g.${group}`, buffer).catch((err) => console.error(err))
+            this._pub.publish(`g.${group}`, buffer).catch((err) => console.error(err))
         } else {
             if (this._options.debug) console.log(`Publishing event ${event} to group ${group}`)
             this._app.publish(group, buffer)

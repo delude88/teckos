@@ -1,15 +1,15 @@
-import { config } from 'dotenv';
-import { uws, UWSProvider } from 'teckos';
+import {uws, UWSProvider} from 'teckos';
 
-config();
 
-const PORT: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
+const redisUrl: string | undefined = "redis://localhost"
+const PORT: number = 4000;
 
 const start = async () => {
   const app = uws.App();
   const io = new UWSProvider(app, {
-    redisUrl: process.env.REDIS_URL,
+    redisUrl: redisUrl,
     pingInterval: 2000,
+    debug: true
   });
   io.onConnection((socket) => {
     socket.join('usergroup');
@@ -36,7 +36,7 @@ const start = async () => {
       io.to('usergroup', 'notification', firstName, lastName);
     });
 
-    socket.on('work', (data, fn: (error?: string) => void) => {
+    socket.on('work', (data: any, fn: (error?: string) => void) => {
       console.log(`Got work to do ${data}`);
       fn('this is the result');
     });

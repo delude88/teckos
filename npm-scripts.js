@@ -20,7 +20,7 @@ const download = async (url, dest) => {
 };
 
 const downloadUWS = async () => {
-    const hasNoBinaries = !fs.existsSync("./uws") || !fs.readdirSync('./uws').find(file => file.endsWith(".node"))
+    const hasNoBinaries = !fs.existsSync("./bin") || !fs.readdirSync('./bin').find(file => file.endsWith(".node"))
     if (hasNoBinaries) {
         try {
             console.log("Downloading node binaries...")
@@ -28,10 +28,13 @@ const downloadUWS = async () => {
             console.log("Extracting node binaries...")
             const zip = new AdmZip(`./binaries-${U_WEBSOCKET_VERSION}.zip`)
             zip.extractAllTo(".", true)
+            if (!fs.existsSync("./bin")) {
+                fs.mkdirSync("./bin")
+            }
             fs.readdirSync(`./uWebSockets.js-${U_WEBSOCKET_VERSION}`)
                 .forEach(file => {
                     if (file.endsWith(".node")) {
-                        fs.renameSync("./uWebSockets.js-" + U_WEBSOCKET_VERSION + "/" + file, "./uws/" + file)
+                        fs.renameSync(`./uWebSockets.js-${U_WEBSOCKET_VERSION}/${file}`, `./bin/${file}`)
                     }
                 })
             rimraf.sync(`./uWebSockets.js-${U_WEBSOCKET_VERSION}`)
@@ -40,6 +43,9 @@ const downloadUWS = async () => {
             console.error(err)
             rimraf.sync(`./binaries-${U_WEBSOCKET_VERSION}.zip`)
             rimraf.sync(`./uWebSockets.js-${U_WEBSOCKET_VERSION}`)
+            if (fs.existsSync("./bin")) {
+                rimraf.sync(`./bin`)
+            }
         }
     }
 };

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { TemplatedApp } from 'uws'
+import { TemplatedApp } from './uws/index.js'
 import { TeckosOptions } from './types/TeckosOptions.js'
 import { ITeckosSocket } from './types/ITeckosSocket.js'
 import { UWSProvider } from './UWSProvider.js'

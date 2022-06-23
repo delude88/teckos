@@ -9,8 +9,7 @@
     "types",
     "src",
     "lib",
-    "npm-scripts.mjs",
-    "uws"
+    "npm-scripts.js"
   ],
   "sideEffects": false,
   "engines": {
@@ -18,11 +17,12 @@
   },
   "scripts": {
     "clean": "rimraf lib",
-    "postinstall": "node npm-scripts.mjs",
-    "ts-types": "tsc -p tsconfig.json",
+    "postinstall": "node npm-scripts.js",
+    "ts-types": "tsc",
     "es-check": "es-check es2020 lib/index.js --module",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register '__tests__/**/*.ts'",
     "build": "rimraf lib types && node esbuild.config.js && npm run ts-types && npm run es-check",
+    "example": "cd example && rimraf node_modules && npm install && npm run start",
     "lint": "npx eslint ./src --ext .ts",
     "preversion": "npm run lint && npm run build && npm run es-check && rimraf uws/*.node",
     "version": "git add -A src",
@@ -53,7 +53,6 @@
   "homepage": "https://github.com/delude88/teckos#readme",
   "devDependencies": {
     "@types/debug": "^4.1.7",
-    "@types/ioredis": "^4.28.10",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
@@ -71,8 +70,9 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.0.0",
+    "ioredis": "^5.0.6",
     "mocha": "^10.0.0",
-    "nodemon": "^2.0.16",
+    "nodemon": "^2.0.17",
     "prettier": "^2.7.1",
     "teckos-client": "^0.2.5",
     "ts-node": "^10.8.1",
@@ -83,8 +83,7 @@
   "dependencies": {
     "adm-zip": "^0.5.9",
     "axios": "^0.27.2",
-    "rimraf": "^3.0.2",
-    "uws": "file:./uws"
+    "rimraf": "^3.0.2"
   },
   "peerDependencies": {
     "ioredis": "^5.0.2"

@@ -284,3 +284,4 @@ dist
 /lib/
 /types/
 /uws/*.node
+/bin/

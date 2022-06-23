@@ -1,5 +1,5 @@
-/* eslint-disable no-console,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
-import { WebSocket } from 'uws'
+/* eslint-disable no-console */
+import { WebSocket } from './uws/index.js'
 import { SocketEventEmitter } from './SocketEventEmitter.js'
 import { decodePacket, encodePacket } from './util/Converter.js'
 import { TeckosSocketEvent } from './types/TeckosSocketEvent.js'
@@ -31,24 +31,28 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
     }
 
     get ws(): WebSocket {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._ws
     }
 
     constructor(id: string, ws: WebSocket, verbose?: boolean) {
         super()
         this._id = id
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         this._ws = ws
         this._debug = verbose
     }
 
     join = (group: string): this => {
         if (this._debug) console.log(`${this._id} joining group ${group}`)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
         this._ws.subscribe(group)
         return this
     }
 
     leave = (group: string): this => {
         if (this._debug) console.log(`${this._id} left group ${group}`)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
         this._ws.unsubscribe(group)
         return this
     }
@@ -85,7 +89,8 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
         if (this._debug)
             console.log(`Sending packet to ${this._id}:  ${JSON.stringify(packet.data)}`)
         if (!this._closed) {
-            return this._ws.send(encodePacket(packet))
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
+            return this._ws.send(encodePacket(packet)) !== 2
         }
         return false
     }
@@ -155,11 +160,13 @@ class UWSSocket extends SocketEventEmitter<TeckosSocketEvent> implements ITeckos
 
     disconnect = (): this => {
         if (this._debug) console.log(`Disconnecting ${this._id}`)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
         this._ws.close()
         this._closed = true
         return this
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return
     getUserData = (key: string): any => this._ws[key]
 }
 

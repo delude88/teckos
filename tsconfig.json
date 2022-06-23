@@ -7,19 +7,21 @@
     "module": "node16",
     "moduleResolution": "node16",
     "lib": ["es2020", "dom"],
-    "strict": true,
     "noImplicitAny": false,
-    "esModuleInterop": true,
     "declarationMap": true,
     "isolatedModules": true,
-    "outDir": "types"
+    "outDir": "types",
+    "esModuleInterop": true,
+    "strict": true
   },
   "include": [
-    "./src/**/*.ts",
+    "./src/**/*.ts"
   ],
   "exclude": [
+    "bin",
+    "example",
+    "types",
     "node_modules",
-    "lib",
-    "uws"
+    "lib"
   ]
 }

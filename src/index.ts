@@ -1,4 +1,3 @@
-import Redis from 'ioredis'
 import { ITeckosProvider } from './types/ITeckosProvider.js'
 import { ITeckosSocket } from './types/ITeckosSocket.js'
 import { TeckosPacket } from './types/TeckosPacket.js'

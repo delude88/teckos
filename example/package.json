@@ -31,7 +31,7 @@
     "eslint": "^8.18.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "nodemon": "^2.0.16",
+    "nodemon": "^2.0.18",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "ts-node": "^10.8.1",
